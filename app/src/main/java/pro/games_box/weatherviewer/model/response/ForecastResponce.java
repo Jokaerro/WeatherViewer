@@ -1,4 +1,4 @@
-package pro.games_box.weatherviewer.model.responce;
+package pro.games_box.weatherviewer.model.response;
 
 /**
  * Created by TESLA on 06.04.2017.
