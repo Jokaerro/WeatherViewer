@@ -1,7 +1,9 @@
 package pro.games_box.weatherviewer.ui.activity;
 
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -13,6 +15,7 @@ import pro.games_box.weatherviewer.api.ApiError;
 import pro.games_box.weatherviewer.api.ErrorUtils;
 import pro.games_box.weatherviewer.model.response.ForecastResponce;
 import pro.games_box.weatherviewer.model.response.WeatherResponce;
+import pro.games_box.weatherviewer.utils.CommonUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -54,7 +57,7 @@ public class MainActivity extends BaseActivity implements Callback {
     }
 
     private void forecastCall(String city) {
-        mForecastResponceCall = Api.getApiService().getForecast(city, "38", "metric","ru", APIKEY);
+        mForecastResponceCall = Api.getApiService().getForecast(city, "38", "metric", "ru", APIKEY);
         mForecastResponceCall.enqueue(this);
     }
 
@@ -64,13 +67,17 @@ public class MainActivity extends BaseActivity implements Callback {
     }
 
     @OnClick(R.id.fab)
-    public void weather() {
-        forecastCall("Moscow");
-    }
+    public void addCity() {
+//        weatherCall("Mosco");
+        CommonUtils.createInputDialog(this, InputType.TYPE_CLASS_TEXT,
+                new CommonUtils.InputDialogListener() {
+                    @Override
+                    public void onInput(AlertDialog dialog, String text) {
+                        dialog.setOnDismissListener(null);
+                        showToast(text);
+                    }
+                });
 
-    @OnClick(R.id.fab2)
-    public void forecast() {
-        weatherCall("Moscow");
     }
 
     @Override
