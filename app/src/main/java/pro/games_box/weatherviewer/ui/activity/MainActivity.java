@@ -1,5 +1,8 @@
 package pro.games_box.weatherviewer.ui.activity;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +16,7 @@ import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.api.Api;
 import pro.games_box.weatherviewer.api.ApiError;
 import pro.games_box.weatherviewer.api.ErrorUtils;
+import pro.games_box.weatherviewer.db.WeatherContract;
 import pro.games_box.weatherviewer.model.response.ForecastResponce;
 import pro.games_box.weatherviewer.model.response.WeatherResponce;
 import pro.games_box.weatherviewer.utils.CommonUtils;
@@ -22,8 +26,21 @@ import retrofit2.Response;
 
 public class MainActivity extends BaseActivity implements Callback {
     private final static String APIKEY = "da2e10fa4e2557831b28f385c2f0f926";
-    private Call<ForecastResponce> mForecastResponceCall;
-    private Call<WeatherResponce> mWeatherResponceCall;
+    private Call<ForecastResponce> mForecastResponseCall;
+    private Call<WeatherResponce> mWeatherResponseCall;
+
+    // Projection and column indices values
+    private static final String[] NOTIFY_CITY_PROJECTION = new String[]{
+            WeatherContract.CityEntry.COLUMN_CITY_SETTING,
+            WeatherContract.CityEntry.COLUMN_CITY_NAME,
+            WeatherContract.CityEntry.COLUMN_COORD_LAT,
+            WeatherContract.CityEntry.COLUMN_COORD_LONG
+    };
+
+    private static final int INDEX_CITY_SETTING = 0;
+    private static final int INDEX_CITY_NAME = 1;
+    private static final int INDEX_COORD_LAT = 2;
+    private static final int INDEX_COORD_LONG = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,13 +74,13 @@ public class MainActivity extends BaseActivity implements Callback {
     }
 
     private void forecastCall(String city) {
-        mForecastResponceCall = Api.getApiService().getForecast(city, "38", "metric", "ru", APIKEY);
-        mForecastResponceCall.enqueue(this);
+        mForecastResponseCall = Api.getApiService().getForecast(city, "38", "metric", "ru", APIKEY);
+        mForecastResponseCall.enqueue(this);
     }
 
     private void weatherCall(String city) {
-        mWeatherResponceCall = Api.getApiService().getWeather(city, "metric", "ru", APIKEY);
-        mWeatherResponceCall.enqueue(this);
+        mWeatherResponseCall = Api.getApiService().getWeather(city, "metric", "ru", APIKEY);
+        mWeatherResponseCall.enqueue(this);
     }
 
     @OnClick(R.id.fab)
@@ -74,19 +91,46 @@ public class MainActivity extends BaseActivity implements Callback {
                     @Override
                     public void onInput(AlertDialog dialog, String text) {
                         dialog.setOnDismissListener(null);
-                        showToast(text);
+                        // Insert the new weather information into the database
+                        ContentValues cityValue = new ContentValues();
+                        cityValue.put(WeatherContract.CityEntry.COLUMN_CITY_NAME, text);
+
+                        // Update data in database
+                        // Insert new data to database
+                        dialog.getContext().getContentResolver()
+                                .insert(WeatherContract.CityEntry.CONTENT_URI, cityValue);
+                        // Delete old data
+                        dialog.getContext().getContentResolver().delete(
+                                WeatherContract.CityEntry.CONTENT_URI,
+                                WeatherContract.CityEntry.COLUMN_CITY_NAME + " == ?",
+                                new String[]{text});
+                        notifyWeather();
                     }
                 });
+
+    }
+
+    public void notifyWeather() {
+//        Context context = this.getContext();
+
+        Cursor cursor = this.getContentResolver()
+                .query(WeatherContract.CityEntry.CONTENT_URI, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            String citySetting = cursor.getString(INDEX_CITY_SETTING);
+            String cityName = cursor.getString(INDEX_CITY_NAME);
+            String cityLat = cursor.getString(INDEX_COORD_LAT);
+            String cityLong = cursor.getString(INDEX_COORD_LONG);
+        }
 
     }
 
     @Override
     public void onResponse(Call call, Response response) {
         if (response.isSuccessful()) {
-            if (call.equals(mForecastResponceCall)) {
+            if (call.equals(mForecastResponseCall)) {
 
 
-            } else if (call.equals(mWeatherResponceCall)) {
+            } else if (call.equals(mWeatherResponseCall)) {
 
             } else {
                 ApiError error = ErrorUtils.parseError(response);
