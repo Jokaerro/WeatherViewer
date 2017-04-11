@@ -52,6 +52,10 @@ public class WeatherProvider extends ContentProvider {
                     "." + WeatherContract.CityEntry.COLUMN_CITY_SETTING + " = ? AND " +
                     WeatherContract.WeatherEntry.COLUMN_DATE + " = ? ";
 
+    private static final String sCityWithLastWeatherSelection =
+            WeatherContract.CityEntry.TABLE_NAME + "." + WeatherContract.CityEntry.COLUMN_CITY_NAME
+                    + "";
+
     private Cursor getWeatherByLocationSetting(Uri uri, String[] projection, String sortOrder) {
         String locationSetting = WeatherContract.WeatherEntry.getCitySettingFromUri(uri);
         long startDate = WeatherContract.WeatherEntry.getStartDateFromUri(uri);

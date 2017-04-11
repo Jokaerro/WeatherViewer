@@ -18,11 +18,11 @@ import pro.games_box.weatherviewer.model.response.WeatherResponce;
  * Created by Tesla on 07.04.2017.
  */
 
-public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherHolder>{
+public class CityAdapter extends RecyclerView.Adapter<CityAdapter.WeatherHolder>{
     private static List<WeatherResponce> mData;
     private final Context mContext;
 
-    public WeatherAdapter(Context context, List<WeatherResponce> data) {
+    public CityAdapter(Context context, List<WeatherResponce> data) {
         // Конструктор адаптера, если прилетает не иницилизированный список инициализруем его
         mContext = context;
         if (data != null)

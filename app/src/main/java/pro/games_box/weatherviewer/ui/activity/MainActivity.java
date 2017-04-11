@@ -2,23 +2,29 @@ package pro.games_box.weatherviewer.ui.activity;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RelativeLayout;
 
+import java.util.ArrayList;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.api.Api;
-import pro.games_box.weatherviewer.api.ApiError;
+import pro.games_box.weatherviewer.utils.ApiError;
 import pro.games_box.weatherviewer.api.ErrorUtils;
 import pro.games_box.weatherviewer.db.WeatherContract;
 import pro.games_box.weatherviewer.model.response.ForecastResponce;
 import pro.games_box.weatherviewer.model.response.WeatherResponce;
+import pro.games_box.weatherviewer.ui.adapter.CityAdapter;
 import pro.games_box.weatherviewer.utils.CommonUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,6 +34,9 @@ public class MainActivity extends BaseActivity implements Callback {
     private final static String APIKEY = "da2e10fa4e2557831b28f385c2f0f926";
     private Call<ForecastResponce> mForecastResponseCall;
     private Call<WeatherResponce> mWeatherResponseCall;
+
+    @BindView(R.id.relative_ll) RelativeLayout relative_ll;
+    @BindView(R.id.city_list) RecyclerView city_recycler;
 
     // Projection and column indices values
     private static final String[] NOTIFY_CITY_PROJECTION = new String[]{
@@ -42,6 +51,8 @@ public class MainActivity extends BaseActivity implements Callback {
     private static final int INDEX_COORD_LAT = 2;
     private static final int INDEX_COORD_LONG = 3;
 
+//    public List<RecyclerAdapterItem> data = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +60,13 @@ public class MainActivity extends BaseActivity implements Callback {
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        city_recycler.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        city_recycler.setLayoutManager(llm);
+
+//        CityAdapter adapter = new CityAdapter(this, data);
+//        city_recycler.setAdapter(adapter);
     }
 
     @Override
