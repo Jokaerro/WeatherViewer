@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.api.Api;
+import pro.games_box.weatherviewer.ui.adapter.CityAdapter;
 import pro.games_box.weatherviewer.utils.ApiError;
 import pro.games_box.weatherviewer.api.ErrorUtils;
 import pro.games_box.weatherviewer.db.WeatherContract;
@@ -27,10 +28,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends BaseActivity implements Callback {
+public class MainActivity extends BaseActivity implements Callback  {
     private final static String APIKEY = "da2e10fa4e2557831b28f385c2f0f926";
     private Call<Forecast> mForecastResponseCall;
     private Call<Weather> mWeatherResponseCall;
+
+    private CityAdapter mCityAdapter = new CityAdapter(this, null);
 
     @BindView(R.id.relative_ll) RelativeLayout relative_ll;
     @BindView(R.id.city_list) RecyclerView city_recycler;
@@ -62,8 +65,7 @@ public class MainActivity extends BaseActivity implements Callback {
         LinearLayoutManager llm = new LinearLayoutManager(this);
         city_recycler.setLayoutManager(llm);
 
-//        CityAdapter adapter = new CityAdapter(this, data);
-//        city_recycler.setAdapter(adapter);
+        city_recycler.setAdapter(mCityAdapter);
     }
 
     @Override
@@ -130,12 +132,7 @@ public class MainActivity extends BaseActivity implements Callback {
 
         Cursor cursor = this.getContentResolver()
                 .query(WeatherContract.CityEntry.CONTENT_URI, null, null, null, null);
-        if (cursor.moveToFirst()) {
-            String citySetting = cursor.getString(INDEX_CITY_SETTING);
-            String cityName = cursor.getString(INDEX_CITY_NAME);
-            String cityLat = cursor.getString(INDEX_COORD_LAT);
-            String cityLong = cursor.getString(INDEX_COORD_LONG);
-        }
+        mCityAdapter.swapCursor(cursor);
 
     }
 

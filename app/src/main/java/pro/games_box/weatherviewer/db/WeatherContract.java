@@ -11,7 +11,7 @@ import android.text.format.Time;
  */
 
 public class WeatherContract {
-    public static final String CONTENT_AUTHORITY = "com.android.isem.goodforecast.app";
+    public static final String CONTENT_AUTHORITY = "pro.games_box.weatherviewer";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_WEATHER = "weather";
     public static final String PATH_CITY = "city";
