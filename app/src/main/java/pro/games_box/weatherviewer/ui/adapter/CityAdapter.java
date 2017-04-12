@@ -1,6 +1,7 @@
 package pro.games_box.weatherviewer.ui.adapter;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,19 +19,19 @@ import pro.games_box.weatherviewer.model.response.WeatherResponce;
  * Created by Tesla on 07.04.2017.
  */
 
-public class CityAdapter extends RecyclerView.Adapter<CityAdapter.WeatherHolder>{
-    private static List<WeatherResponce> mData;
+public class CityAdapter extends RecyclerView.Adapter<CityAdapter.CityHolder>{
+//    private static List<WeatherResponce> mData;
     private final Context mContext;
 
-    public CityAdapter(Context context, List<WeatherResponce> data) {
+    public CityAdapter(Context context, Cursor data) {
         // Конструктор адаптера, если прилетает не иницилизированный список инициализруем его
         mContext = context;
-        if (data != null)
-            mData = new ArrayList<>(data);
-        else mData = new ArrayList<>();
+//        if (data != null)
+//            mData = new
+//        else mData = new ArrayList<>();
     }
 
-    public class WeatherHolder extends RecyclerView.ViewHolder {
+    public class CityHolder extends RecyclerView.ViewHolder {
         // Холдер который отображает данные одного айтема из списка
         public final ImageView weather_icon;
         public final TextView weather_temp;
@@ -41,7 +42,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.WeatherHolder>
         public final TextView weather_wind;
         public final TextView weather_pressure;
 
-        public WeatherHolder(View itemView) {
+        public CityHolder(View itemView) {
             super(itemView);
 //            Context context = itemView.getContext();
             weather_icon = (ImageView) itemView.findViewById(R.id.weather_icon);
@@ -56,20 +57,20 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.WeatherHolder>
     }
 
     @Override
-    public WeatherHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public CityHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(mContext).inflate(R.layout.city_card, parent, false);
-        return new WeatherHolder(view);
+        return new CityHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(WeatherHolder holder, int position) {
+    public void onBindViewHolder(CityHolder holder, int position) {
 //        holder.title.setText(mData.get(position).getTitle());
-        holder.weather_temp.setText(Float.toString(mData.get(position).temperature.getTemp()));
+//        holder.weather_temp.setText(Float.toString(mData.get(position).temperature.getTemp()));
 //        holder.weather_city.setText(mData.get(position).)
-        holder.weather_description.setText(mData.get(position).currentCondition.getDescr());
-        holder.weather_humidity.setText(Float.toString(mData.get(position).currentCondition.getHumidity()));
-        holder.weather_wind.setText(Float.toString(mData.get(position).wind.getSpeed()));
-        holder.weather_pressure.setText(Float.toString(mData.get(position).currentCondition.getPressure()));
+//        holder.weather_description.setText(mData.get(position).currentCondition.getDescr());
+//        holder.weather_humidity.setText(Float.toString(mData.get(position).currentCondition.getHumidity()));
+//        holder.weather_wind.setText(Float.toString(mData.get(position).wind.getSpeed()));
+//        holder.weather_pressure.setText(Float.toString(mData.get(position).currentCondition.getPressure()));
 //        holder.weather_datetime.setText(mData.get(position).);
 
 //        final String title =  holder.title.getText().toString();
@@ -84,6 +85,6 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.WeatherHolder>
     @Override
     public int getItemCount() {
         // Не забываем указать количество айтемов в списке
-        return mData.size();
+        return 0;//mData.size();
     }
 }

@@ -22,6 +22,7 @@ public class WeatherProvider extends ContentProvider {
     static final int WEATHER_WITH_CITY = 101;
     static final int WEATHER_WITH_CITY_AND_DATE = 102;
     static final int CITY = 300;
+    static final int CITY_WITH_LAST_WEATHER = 301;
 
     private static final SQLiteQueryBuilder sWeatherByLocationSettingQueryBuilder;
 
@@ -32,6 +33,20 @@ public class WeatherProvider extends ContentProvider {
         sWeatherByLocationSettingQueryBuilder.setTables(
                 WeatherContract.WeatherEntry.TABLE_NAME + " INNER JOIN " +
                         WeatherContract.CityEntry.TABLE_NAME +
+                        " ON " + WeatherContract.WeatherEntry.TABLE_NAME +
+                        "." + WeatherContract.WeatherEntry.COLUMN_LOC_KEY +
+                        " = " + WeatherContract.CityEntry.TABLE_NAME +
+                        "." + WeatherContract.CityEntry._ID);
+    }
+
+    private static final SQLiteQueryBuilder sCitiesWithWeatherSettingQueryBuilder;
+    static{
+        sCitiesWithWeatherSettingQueryBuilder = new SQLiteQueryBuilder();
+    /* SELECT * from city left JOIN weather ON  weather._LOC_KEY = city._id GROUP BY city_name order by _DATE DESC*/
+        /** weather INNER JOIN location ON weather.location_id = location._id */
+        sCitiesWithWeatherSettingQueryBuilder.setTables(
+                WeatherContract.CityEntry.TABLE_NAME + " LEFT JOIN " +
+                        WeatherContract.WeatherEntry.TABLE_NAME +
                         " ON " + WeatherContract.WeatherEntry.TABLE_NAME +
                         "." + WeatherContract.WeatherEntry.COLUMN_LOC_KEY +
                         " = " + WeatherContract.CityEntry.TABLE_NAME +
@@ -81,6 +96,17 @@ public class WeatherProvider extends ContentProvider {
         );
     }
 
+    private Cursor getCitiesWithLastWeather(Uri uri, String[] projection,  String selection,
+                                            String[] selectionArgs,  String sortOrder){
+        return sCitiesWithWeatherSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                WeatherContract.CityEntry.COLUMN_CITY_NAME,
+                null,
+                sortOrder);
+    }
+
     private Cursor getWeatherByCitySettingAndDate(
             Uri uri, String[] projection, String sortOrder) {
         String locationSetting = WeatherContract.WeatherEntry.getCitySettingFromUri(uri);
@@ -126,6 +152,11 @@ public class WeatherProvider extends ContentProvider {
             case WEATHER_WITH_CITY_AND_DATE:
             {
                 retCursor = getWeatherByCitySettingAndDate(uri, projection, sortOrder);
+                break;
+            }
+            case CITY_WITH_LAST_WEATHER:
+            {
+                retCursor = getCitiesWithLastWeather(uri, projection, selection, selectionArgs, sortOrder);
                 break;
             }
             // "weather/*"
@@ -181,6 +212,8 @@ public class WeatherProvider extends ContentProvider {
                 return WeatherContract.WeatherEntry.CONTENT_TYPE;
             case CITY:
                 return WeatherContract.CityEntry.CONTENT_TYPE;
+            case CITY_WITH_LAST_WEATHER:
+                return WeatherContract.CityEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
