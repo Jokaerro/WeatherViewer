@@ -12,8 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
 
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -22,9 +20,8 @@ import pro.games_box.weatherviewer.api.Api;
 import pro.games_box.weatherviewer.utils.ApiError;
 import pro.games_box.weatherviewer.api.ErrorUtils;
 import pro.games_box.weatherviewer.db.WeatherContract;
-import pro.games_box.weatherviewer.model.response.ForecastResponce;
-import pro.games_box.weatherviewer.model.response.WeatherResponce;
-import pro.games_box.weatherviewer.ui.adapter.CityAdapter;
+import pro.games_box.weatherviewer.model.response.Forecast;
+import pro.games_box.weatherviewer.model.response.Weather;
 import pro.games_box.weatherviewer.utils.CommonUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,8 +29,8 @@ import retrofit2.Response;
 
 public class MainActivity extends BaseActivity implements Callback {
     private final static String APIKEY = "da2e10fa4e2557831b28f385c2f0f926";
-    private Call<ForecastResponce> mForecastResponseCall;
-    private Call<WeatherResponce> mWeatherResponseCall;
+    private Call<Forecast> mForecastResponseCall;
+    private Call<Weather> mWeatherResponseCall;
 
     @BindView(R.id.relative_ll) RelativeLayout relative_ll;
     @BindView(R.id.city_list) RecyclerView city_recycler;

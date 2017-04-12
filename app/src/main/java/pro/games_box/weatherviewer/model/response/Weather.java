@@ -4,15 +4,34 @@ package pro.games_box.weatherviewer.model.response;
  * Created by TESLA on 06.04.2017.
  */
 
-public class WeatherResponce {
+public class Weather {
     public CurrentCondition currentCondition = new CurrentCondition();
     public Temperature temperature = new Temperature();
     public Wind wind = new Wind();
     public Rain rain = new Rain();
     public Snow snow = new Snow()	;
     public Clouds clouds = new Clouds();
+    private String CityName;
+    private String dateTime;
 
     public byte[] iconData;
+
+    public void setDateTime(String dateTime){
+        this.dateTime = dateTime;
+    }
+
+    public String getDateTime(){
+        return this.dateTime;
+    }
+
+    public void setCityName(String city)
+    {
+        CityName = city;
+    }
+
+    public String getCityName(){
+        return CityName;
+    }
 
     public  class CurrentCondition {
         private int weatherId;
@@ -24,9 +43,7 @@ public class WeatherResponce {
         private float pressure;
         private float humidity;
 
-        public int getWeatherId() {
-            return weatherId;
-        }
+        public int getWeatherId() {return weatherId;}
         public void setWeatherId(int weatherId) {
             this.weatherId = weatherId;
         }

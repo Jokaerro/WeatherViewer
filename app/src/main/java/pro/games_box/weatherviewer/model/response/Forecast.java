@@ -4,13 +4,13 @@ package pro.games_box.weatherviewer.model.response;
  * Created by TESLA on 06.04.2017.
  */
 
-public class ForecastResponce {
+public class Forecast {
     private String name;
     private String country;
     private String temp;
     private String description;
 
-    public ForecastResponce(String name, String country, String temp, String description) {
+    public Forecast(String name, String country, String temp, String description) {
         this.name = name;
         this.country = country;
         this.temp = temp;

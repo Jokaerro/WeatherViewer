@@ -1,7 +1,7 @@
 package pro.games_box.weatherviewer.api;
 
-import pro.games_box.weatherviewer.model.response.ForecastResponce;
-import pro.games_box.weatherviewer.model.response.WeatherResponce;
+import pro.games_box.weatherviewer.model.response.Forecast;
+import pro.games_box.weatherviewer.model.response.Weather;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -12,15 +12,15 @@ import retrofit2.http.Query;
 
 public interface IEndpoint {
     @GET("weather")
-    Call<WeatherResponce> getWeather(@Query("q") String city,
-                                     @Query("units") String units,
-                                     @Query("lang") String lang,
-                                     @Query("appid") String apikey);
+    Call<Weather> getWeather(@Query("q") String city,
+                             @Query("units") String units,
+                             @Query("lang") String lang,
+                             @Query("appid") String apikey);
 
     @GET("forecast")
-    Call<ForecastResponce> getForecast(@Query("q") String city,
-                                       @Query("cnt") String limit,
-                                       @Query("units") String unit,
-                                       @Query("lang") String lang,
-                                       @Query("appid") String apikey);
+    Call<Forecast> getForecast(@Query("q") String city,
+                               @Query("cnt") String limit,
+                               @Query("units") String unit,
+                               @Query("lang") String lang,
+                               @Query("appid") String apikey);
 }
