@@ -138,6 +138,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.CityHolder>{
             mRowIdColumn = newCursor.getColumnIndexOrThrow(BaseColumns._ID);
             mDataValid = true;
             notifyDataSetChanged();
+            notifyItemInserted(getItemCount());
         } else {
             mRowIdColumn = -1;
             mDataValid = false;

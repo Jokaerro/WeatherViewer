@@ -33,7 +33,7 @@ public class MainActivity extends BaseActivity implements Callback  {
     private Call<Forecast> mForecastResponseCall;
     private Call<Weather> mWeatherResponseCall;
 
-    private CityAdapter mCityAdapter = new CityAdapter(this, null);
+    private CityAdapter mCityAdapter;
 
     @BindView(R.id.relative_ll) RelativeLayout relative_ll;
     @BindView(R.id.city_list) RecyclerView city_recycler;
@@ -61,6 +61,11 @@ public class MainActivity extends BaseActivity implements Callback  {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Cursor cursor = this.getContentResolver()
+                .query(WeatherContract.CityEntry.CONTENT_URI, null, null, null, null);
+        mCityAdapter = new CityAdapter(this, cursor);
+
+        showToast(String.format("%d", cursor.getCount()));
         city_recycler.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         city_recycler.setLayoutManager(llm);
@@ -116,11 +121,11 @@ public class MainActivity extends BaseActivity implements Callback  {
                         // Insert new data to database
                         dialog.getContext().getContentResolver()
                                 .insert(WeatherContract.CityEntry.CONTENT_URI, cityValue);
-                        // Delete old data
-                        dialog.getContext().getContentResolver().delete(
-                                WeatherContract.CityEntry.CONTENT_URI,
-                                WeatherContract.CityEntry.COLUMN_CITY_NAME + " == ?",
-                                new String[]{text});
+//                        // Delete old data
+//                        dialog.getContext().getContentResolver().delete(
+//                                WeatherContract.CityEntry.CONTENT_URI,
+//                                WeatherContract.CityEntry.COLUMN_CITY_NAME + " == ?",
+//                                new String[]{text});
                         notifyWeather();
                     }
                 });
@@ -133,7 +138,7 @@ public class MainActivity extends BaseActivity implements Callback  {
         Cursor cursor = this.getContentResolver()
                 .query(WeatherContract.CityEntry.CONTENT_URI, null, null, null, null);
         mCityAdapter.swapCursor(cursor);
-
+//        showToast(String.format("%d", cursor.getCount()));
     }
 
     @Override
