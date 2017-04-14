@@ -8,17 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import java.util.Locale;
 
 import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.WeatherApplication;
 import pro.games_box.weatherviewer.db.DataMapper;
 import pro.games_box.weatherviewer.db.WeatherContract;
-import pro.games_box.weatherviewer.model.response.Weather;
+import pro.games_box.weatherviewer.model.response.WeatherResponce;
+import pro.games_box.weatherviewer.ui.activity.MainActivity;
 import pro.games_box.weatherviewer.ui.adapter.holder.CityHolder;
 
 /**
@@ -67,17 +63,26 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder>{
 
     public void onBindViewHolder(CityHolder viewHolder, Cursor cursor) {
         final CityHolder holder = viewHolder;
-        viewHolder.fill(mDataMapper.fromCursorJoinCityAndWeather(cursor));
+        final WeatherResponce weather = mDataMapper.fromCursorJoinCityAndWeather(cursor);
+        viewHolder.fill(weather);
         viewHolder.weather_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 view.getContext().getContentResolver().delete(WeatherContract.CityEntry.CONTENT_URI,
                         WeatherContract.CityEntry.COLUMN_CITY_NAME + " == ?",
-                        new String[]{holder.weather_city.getText().toString()});
-                
+                        new String[]{weather.getCityName()});
+
                 Cursor cursor = view.getContext().getContentResolver()
                         .query(WeatherContract.CityEntry.buildCityWithLastWeather(), null, null, null, null);
                 swapCursor(cursor);
+            }
+        });
+        viewHolder.weather_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mContext instanceof MainActivity){
+                    ((MainActivity)mContext).weatherCall(weather);
+                }
             }
         });
     }

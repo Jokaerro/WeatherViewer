@@ -9,9 +9,7 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import pro.games_box.weatherviewer.R;
-import pro.games_box.weatherviewer.WeatherApplication;
-import pro.games_box.weatherviewer.db.WeatherContract;
-import pro.games_box.weatherviewer.model.response.Weather;
+import pro.games_box.weatherviewer.model.response.WeatherResponce;
 
 /**
  * Created by Tesla on 14.04.2017.
@@ -43,7 +41,7 @@ public class CityHolder extends RecyclerView.ViewHolder {
         weather_pressure = (TextView) itemView.findViewById(R.id.weather_pressure);
     }
 
-    public void fill(final Weather weather) {
+    public void fill(final WeatherResponce weather) {
         weather_temp.setText(String.format(Locale.US, "%.1f-%.1f", weather.temperature.getMinTemp(),
                 weather.temperature.getMaxTemp()));
         weather_city.setText(weather.getCityName());

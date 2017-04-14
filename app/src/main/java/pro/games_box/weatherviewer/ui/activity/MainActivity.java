@@ -22,7 +22,7 @@ import pro.games_box.weatherviewer.utils.ApiError;
 import pro.games_box.weatherviewer.api.ErrorUtils;
 import pro.games_box.weatherviewer.db.WeatherContract;
 import pro.games_box.weatherviewer.model.response.Forecast;
-import pro.games_box.weatherviewer.model.response.Weather;
+import pro.games_box.weatherviewer.model.response.WeatherResponce;
 import pro.games_box.weatherviewer.utils.CommonUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,7 +31,7 @@ import retrofit2.Response;
 public class MainActivity extends BaseActivity implements Callback  {
     private final static String APIKEY = "da2e10fa4e2557831b28f385c2f0f926";
     private Call<Forecast> mForecastResponseCall;
-    private Call<Weather> mWeatherResponseCall;
+    private Call<WeatherResponce> mWeatherResponseCall;
 
     private CityAdapter mCityAdapter;
 
@@ -100,9 +100,35 @@ public class MainActivity extends BaseActivity implements Callback  {
         mForecastResponseCall.enqueue(this);
     }
 
-    private void weatherCall(String city) {
-        mWeatherResponseCall = Api.getApiService().getWeather(city, "metric", "ru", APIKEY);
-        mWeatherResponseCall.enqueue(this);
+    public void weatherCall(final WeatherResponce weather) {
+        mWeatherResponseCall = Api.getApiService().getWeather(weather.getCityName(), "metric", "ru", APIKEY);
+        mWeatherResponseCall.enqueue(new Callback<WeatherResponce>() {
+            @Override
+            public void onResponse(Call<WeatherResponce> call, Response<WeatherResponce> response) {
+                if (call.equals(mWeatherResponseCall)) {
+                    WeatherResponce weatherResponse = ((Response<WeatherResponce>) response).body();
+                    ContentValues weatherValue = new ContentValues();
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, weather.getCityName());
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_DATE, "");
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, "");
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, "");
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, "");
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, "");
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, "");
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, "");
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, "");
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, "");
+                    getContentResolver()
+                            .insert(WeatherContract.WeatherEntry.CONTENT_URI, weatherValue);
+                    notifyWeather();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<WeatherResponce> call, Throwable t) {
+
+            }
+        });
     }
 
     @OnClick(R.id.fab)
@@ -143,8 +169,6 @@ public class MainActivity extends BaseActivity implements Callback  {
         if (response.isSuccessful()) {
             if (call.equals(mForecastResponseCall)) {
 
-
-            } else if (call.equals(mWeatherResponseCall)) {
 
             } else {
                 ApiError error = ErrorUtils.parseError(response);
