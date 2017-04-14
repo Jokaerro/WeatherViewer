@@ -3,6 +3,7 @@ package pro.games_box.weatherviewer.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 
 import pro.games_box.weatherviewer.db.WeatherContract.CityEntry;
 import pro.games_box.weatherviewer.db.WeatherContract.WeatherEntry;
@@ -12,7 +13,7 @@ import pro.games_box.weatherviewer.db.WeatherContract.WeatherEntry;
  */
 
 public class WeatherDbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     static final String DATABASE_NAME = "weather.db";
 
     public WeatherDbHelper(Context context) {
@@ -22,7 +23,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + CityEntry.TABLE_NAME + " (" +
-                CityEntry._ID + " INTEGER PRIMARY KEY, " +
+                BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 CityEntry.COLUMN_CITY_SETTING + " TEXT, " +
                 CityEntry.COLUMN_CITY_NAME + " TEXT NOT NULL, " +
                 CityEntry.COLUMN_COORD_LAT + " REAL, " +
@@ -30,7 +31,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                 ");";
 
         final String SQL_CREATE_WEATHER_TABLE = "CREATE TABLE " + WeatherEntry.TABLE_NAME + " (" +
-                WeatherEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
                 // the ID of the location entry associated with this weather data
                 WeatherEntry.COLUMN_LOC_KEY + " INTEGER NOT NULL, " +

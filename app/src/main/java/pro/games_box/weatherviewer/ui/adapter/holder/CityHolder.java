@@ -1,11 +1,13 @@
 package pro.games_box.weatherviewer.ui.adapter.holder;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.Date;
 import java.util.Locale;
 
 import pro.games_box.weatherviewer.R;
@@ -42,14 +44,15 @@ public class CityHolder extends RecyclerView.ViewHolder {
     }
 
     public void fill(final WeatherResponce weather) {
-        weather_temp.setText(String.format(Locale.US, "%.1f-%.1f", weather.temperature.getMinTemp(),
-                weather.temperature.getMaxTemp()));
-        weather_city.setText(weather.getCityName());
-        weather_description.setText(weather.currentCondition.getDescr());
-        weather_datetime.setText(weather.getDateTime());
-        weather_humidity.setText(String.format(Locale.US, "%.0f", weather.currentCondition.getHumidity()));
-        weather_wind.setText(String.format(Locale.US, "%.1f", weather.wind.getSpeed()));
-        weather_pressure.setText(String.format(Locale.US, "%.0f", weather.currentCondition.getPressure()));
+        weather_temp.setText(String.format(Locale.US, "%.1f-%.1f", weather.getMainConditions().getTempMin(),
+                weather.getMainConditions().getTempMax()));
+        weather_city.setText(weather.getBdCityName());
+        weather_description.setText(weather.getWeather().get(0).getDescription());
+        String dateString = DateFormat.format("dd/MM/yy HH:mm", new Date(weather.getDatetime())).toString();
+        weather_datetime.setText(dateString);
+        weather_humidity.setText(String.format(Locale.US, "%.0f", weather.getMainConditions().getHumidity()));
+        weather_wind.setText(String.format(Locale.US, "%.1f", weather.getWind().getSpeed()));
+        weather_pressure.setText(String.format(Locale.US, "%.0f", weather.getMainConditions().getPressure()));
 
 
 //            weather_icon.setOnClickListener(new View.OnClickListener() {

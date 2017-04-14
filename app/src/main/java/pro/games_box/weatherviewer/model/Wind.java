@@ -28,4 +28,12 @@ public class Wind {
     public Double getDegree() {
         return degree;
     }
+
+    public void setSpeed(Double speed) {
+        this.speed = speed;
+    }
+
+    public void setDegree(Double degree) {
+        this.degree = degree;
+    }
 }

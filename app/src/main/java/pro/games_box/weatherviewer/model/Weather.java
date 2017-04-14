@@ -50,4 +50,8 @@ public class Weather {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 }

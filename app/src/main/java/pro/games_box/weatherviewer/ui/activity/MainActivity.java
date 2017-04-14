@@ -101,23 +101,23 @@ public class MainActivity extends BaseActivity implements Callback  {
     }
 
     public void weatherCall(final WeatherResponce weather) {
-        mWeatherResponseCall = Api.getApiService().getWeather(weather.getCityName(), "metric", "ru", APIKEY);
+        mWeatherResponseCall = Api.getApiService().getWeather(weather.getBdCityName(), "metric", "ru", APIKEY);
         mWeatherResponseCall.enqueue(new Callback<WeatherResponce>() {
             @Override
             public void onResponse(Call<WeatherResponce> call, Response<WeatherResponce> response) {
                 if (call.equals(mWeatherResponseCall)) {
                     WeatherResponce weatherResponse = ((Response<WeatherResponce>) response).body();
                     ContentValues weatherValue = new ContentValues();
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, weather.getCityName());
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_DATE, "");
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, "");
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, "");
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, "");
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, "");
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, "");
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, "");
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, "");
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, "");
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, weather.getBdCityId());
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_DATE, weatherResponse.getDatetime());
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, weatherResponse.getWeather().get(0).getDescription());
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherResponse.getWeather().get(0).getId());
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, weatherResponse.getMainConditions().getTempMin());
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, weatherResponse.getMainConditions().getTempMax());
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, weatherResponse.getMainConditions().getHumidity());
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, weatherResponse.getMainConditions().getPressure());
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, weatherResponse.getWind().getSpeed());
+                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, weatherResponse.getWind().getDegree());
                     getContentResolver()
                             .insert(WeatherContract.WeatherEntry.CONTENT_URI, weatherValue);
                     notifyWeather();
@@ -126,7 +126,7 @@ public class MainActivity extends BaseActivity implements Callback  {
 
             @Override
             public void onFailure(Call<WeatherResponce> call, Throwable t) {
-
+                showToast("onFail");
             }
         });
     }

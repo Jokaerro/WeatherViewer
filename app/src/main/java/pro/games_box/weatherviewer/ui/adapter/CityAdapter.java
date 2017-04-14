@@ -21,8 +21,8 @@ import pro.games_box.weatherviewer.ui.adapter.holder.CityHolder;
  * Created by Tesla on 07.04.2017.
  */
 
-public class CityAdapter extends RecyclerView.Adapter<CityHolder>{
-//    private static List<WeatherResponce> mData;
+public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
+    //    private static List<WeatherResponce> mData;
     private final Context mContext;
     private Cursor mCursor;
     private boolean mDataValid;
@@ -70,7 +70,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder>{
             public void onClick(View view) {
                 view.getContext().getContentResolver().delete(WeatherContract.CityEntry.CONTENT_URI,
                         WeatherContract.CityEntry.COLUMN_CITY_NAME + " == ?",
-                        new String[]{weather.getCityName()});
+                        new String[]{weather.getBdCityName()});
 
                 Cursor cursor = view.getContext().getContentResolver()
                         .query(WeatherContract.CityEntry.buildCityWithLastWeather(), null, null, null, null);
@@ -80,8 +80,8 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder>{
         viewHolder.weather_icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mContext instanceof MainActivity){
-                    ((MainActivity)mContext).weatherCall(weather);
+                if (mContext instanceof MainActivity) {
+                    ((MainActivity) mContext).weatherCall(weather);
                 }
             }
         });

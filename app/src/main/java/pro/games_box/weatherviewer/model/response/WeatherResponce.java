@@ -10,6 +10,7 @@ import pro.games_box.weatherviewer.model.Coord;
 import pro.games_box.weatherviewer.model.Main;
 import pro.games_box.weatherviewer.model.Rain;
 import pro.games_box.weatherviewer.model.Snow;
+import pro.games_box.weatherviewer.model.Sys;
 import pro.games_box.weatherviewer.model.Weather;
 import pro.games_box.weatherviewer.model.Wind;
 
@@ -19,13 +20,13 @@ import pro.games_box.weatherviewer.model.Wind;
 
 public class WeatherResponce {
     private String bdCityName;
-    private String bdCityId;
+    private int bdCityId;
 
     public void setBdCityName(String bdCityName) {
         this.bdCityName = bdCityName;
     }
 
-    public void setBdCityId(String bdCityId) {
+    public void setBdCityId(int bdCityId) {
         this.bdCityId = bdCityId;
     }
 
@@ -57,7 +58,7 @@ public class WeatherResponce {
         this.datetime = datetime;
     }
 
-    public void setSys(float sys) {
+    public void setSys(Sys sys) {
         this.sys = sys;
     }
 
@@ -82,7 +83,7 @@ public class WeatherResponce {
         return bdCityName;
     }
 
-    public String getBdCityId() {
+    public int getBdCityId() {
         return bdCityId;
     }
 
@@ -114,7 +115,7 @@ public class WeatherResponce {
         return datetime;
     }
 
-    public float getSys() {
+    public Sys getSys() {
         return sys;
     }
 
@@ -164,7 +165,7 @@ public class WeatherResponce {
 
     @SerializedName("sys")
     @Expose
-    private float sys;
+    private Sys sys;
 
     @SerializedName("id")
     @Expose
