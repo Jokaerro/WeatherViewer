@@ -15,7 +15,9 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import pro.games_box.weatherviewer.R;
+import pro.games_box.weatherviewer.WeatherApplication;
 import pro.games_box.weatherviewer.db.DataMapper;
+import pro.games_box.weatherviewer.db.WeatherContract;
 import pro.games_box.weatherviewer.model.response.Weather;
 import pro.games_box.weatherviewer.ui.adapter.holder.CityHolder;
 
@@ -31,6 +33,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder>{
     private int mRowIdColumn;
     private ChangeObservable mDataSetObserver;
     private DataMapper mDataMapper = new DataMapper();
+    private WeatherApplication mApplication;
 
     public CityAdapter(Context context, Cursor data) {
         // Конструктор адаптера, если прилетает не иницилизированный список инициализруем его
@@ -42,6 +45,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder>{
         if (mCursor != null) {
             mCursor.registerDataSetObserver(mDataSetObserver);
         }
+        mApplication = WeatherApplication.getInstance();
     }
 
     @Override
@@ -62,7 +66,20 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder>{
     }
 
     public void onBindViewHolder(CityHolder viewHolder, Cursor cursor) {
+        final CityHolder holder = viewHolder;
         viewHolder.fill(mDataMapper.fromCursorJoinCityAndWeather(cursor));
+        viewHolder.weather_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                view.getContext().getContentResolver().delete(WeatherContract.CityEntry.CONTENT_URI,
+                        WeatherContract.CityEntry.COLUMN_CITY_NAME + " == ?",
+                        new String[]{holder.weather_city.getText().toString()});
+                
+                Cursor cursor = view.getContext().getContentResolver()
+                        .query(WeatherContract.CityEntry.buildCityWithLastWeather(), null, null, null, null);
+                swapCursor(cursor);
+            }
+        });
     }
 
     protected Cursor getCursor() {

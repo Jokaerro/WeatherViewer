@@ -59,13 +59,6 @@ public class CityHolder extends RecyclerView.ViewHolder {
 //                public void onClick(View view) {
 //                }
 //            });
-            weather_delete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    view.getContext().getContentResolver().delete(WeatherContract.CityEntry.CONTENT_URI,
-                            WeatherContract.CityEntry.COLUMN_CITY_NAME + " == ?",
-                            new String[]{weather_city.getText().toString()});
-                }
-            });
+
     }
 }

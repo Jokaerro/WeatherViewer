@@ -133,12 +133,9 @@ public class MainActivity extends BaseActivity implements Callback  {
     }
 
     public void notifyWeather() {
-//        Context context = this.getContext();
-
         Cursor cursor = this.getContentResolver()
                 .query(WeatherContract.CityEntry.buildCityWithLastWeather(), null, null, null, null);
         mCityAdapter.swapCursor(cursor);
-//        showToast(String.format("%d", cursor.getCount()));
     }
 
     @Override
