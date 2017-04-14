@@ -13,7 +13,7 @@ import pro.games_box.weatherviewer.db.WeatherContract.WeatherEntry;
  */
 
 public class WeatherDbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     static final String DATABASE_NAME = "weather.db";
 
     public WeatherDbHelper(Context context) {

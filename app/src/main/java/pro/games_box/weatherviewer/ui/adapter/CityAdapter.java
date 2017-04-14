@@ -73,7 +73,20 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
                         new String[]{weather.getBdCityName()});
 
                 Cursor cursor = view.getContext().getContentResolver()
-                        .query(WeatherContract.CityEntry.buildCityWithLastWeather(), null, null, null, null);
+                        .query(WeatherContract.CityEntry.buildCityWithLastWeather(),
+                                new String[]{"city."+ WeatherContract.CityEntry._ID,
+                                        WeatherContract.CityEntry.COLUMN_CITY_NAME,
+                                        WeatherContract.WeatherEntry.COLUMN_DATE,
+                                        WeatherContract.WeatherEntry.COLUMN_DEGREES,
+                                        WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
+                                        WeatherContract.WeatherEntry.COLUMN_LOC_KEY,
+                                        WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+                                        WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
+                                        WeatherContract.WeatherEntry.COLUMN_PRESSURE,
+                                        WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
+                                        WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
+                                        WeatherContract.WeatherEntry.COLUMN_WIND_SPEED},
+                                null, null, null);
                 swapCursor(cursor);
             }
         });

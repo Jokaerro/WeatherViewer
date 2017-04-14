@@ -28,15 +28,17 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends BaseActivity implements Callback  {
+public class MainActivity extends BaseActivity implements Callback {
     private final static String APIKEY = "da2e10fa4e2557831b28f385c2f0f926";
     private Call<Forecast> mForecastResponseCall;
     private Call<WeatherResponce> mWeatherResponseCall;
 
     private CityAdapter mCityAdapter;
 
-    @BindView(R.id.relative_ll) RelativeLayout relative_ll;
-    @BindView(R.id.city_list) RecyclerView city_recycler;
+    @BindView(R.id.relative_ll)
+    RelativeLayout relative_ll;
+    @BindView(R.id.city_list)
+    RecyclerView city_recycler;
 
     // Projection and column indices values
     private static final String[] NOTIFY_CITY_PROJECTION = new String[]{
@@ -62,7 +64,20 @@ public class MainActivity extends BaseActivity implements Callback  {
         setSupportActionBar(toolbar);
 
         Cursor cursor = this.getContentResolver()
-                .query(WeatherContract.CityEntry.buildCityWithLastWeather(), null, null, null, null);
+                .query(WeatherContract.CityEntry.buildCityWithLastWeather(),
+                        new String[]{"city."+ WeatherContract.CityEntry._ID,
+                                WeatherContract.CityEntry.COLUMN_CITY_NAME,
+                                WeatherContract.WeatherEntry.COLUMN_DATE,
+                                WeatherContract.WeatherEntry.COLUMN_DEGREES,
+                                WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
+                                WeatherContract.WeatherEntry.COLUMN_LOC_KEY,
+                                WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+                                WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
+                                WeatherContract.WeatherEntry.COLUMN_PRESSURE,
+                                WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
+                                WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
+                                WeatherContract.WeatherEntry.COLUMN_WIND_SPEED},
+                        null, null, null);
         mCityAdapter = new CityAdapter(this, cursor);
 
         showToast(String.format("%d", cursor.getCount()));
@@ -160,7 +175,20 @@ public class MainActivity extends BaseActivity implements Callback  {
 
     public void notifyWeather() {
         Cursor cursor = this.getContentResolver()
-                .query(WeatherContract.CityEntry.buildCityWithLastWeather(), null, null, null, null);
+                .query(WeatherContract.CityEntry.buildCityWithLastWeather(),
+                        new String[]{"city."+ WeatherContract.CityEntry._ID,
+                                WeatherContract.CityEntry.COLUMN_CITY_NAME,
+                                WeatherContract.WeatherEntry.COLUMN_DATE,
+                                WeatherContract.WeatherEntry.COLUMN_DEGREES,
+                                WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
+                                WeatherContract.WeatherEntry.COLUMN_LOC_KEY,
+                                WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+                                WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
+                                WeatherContract.WeatherEntry.COLUMN_PRESSURE,
+                                WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
+                                WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
+                                WeatherContract.WeatherEntry.COLUMN_WIND_SPEED},
+                        null, null, null);
         mCityAdapter.swapCursor(cursor);
     }
 
