@@ -20,12 +20,14 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
+            android:weightSum="8"
             >
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="90dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:gravity="center"
+                android:layout_weight="1"
                 >
                 <ImageView
                     android:id="@+id/weather_icon"
@@ -35,20 +37,23 @@
                     />
                 </LinearLayout>
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="160dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="30dp"
+                android:layout_weight="5"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 >
                 <TextView
                     android:id="@+id/weather_temp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="+30 C"
+                    android:text="@string/weather_temp"
                     android:textSize="20sp"
                     android:fontFamily="sans-serif"
                     android:textStyle="bold"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
                     />
                 <TextView
                     android:id="@+id/weather_city"
@@ -69,10 +74,10 @@
                     />
             </LinearLayout>
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="110dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
                 >
                 <TextView
                     android:id="@+id/weather_datetime"
@@ -86,7 +91,7 @@
                     android:id="@+id/weather_humidity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Влажность 80 %"
+                    android:text="@string/weather_humidity"
                     android:textSize="12sp"
                     android:fontFamily="sans-serif"
                     />
@@ -94,7 +99,7 @@
                     android:id="@+id/weather_wind"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ветер 1.1 м/с"
+                    android:text="@string/weather_wind"
                     android:textSize="12sp"
                     android:fontFamily="sans-serif"
                     />
@@ -102,15 +107,17 @@
                     android:id="@+id/weather_pressure"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Давление 755 мм рт ст"
+                    android:text="@string/weather_pressure"
                     android:textSize="12sp"
                     android:fontFamily="sans-serif"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
                     />
 
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/weather_delete"
-                android:layout_width="0dp"
+                android:layout_width="20dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="right"
                 android:gravity="right"

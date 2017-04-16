@@ -11,7 +11,7 @@ public class Weather {
 //"weather":[{"id":803,"main":"Clouds","description":"пасмурно","icon":"04d"}],
     @SerializedName("id")
     @Expose
-    private long id;
+    private int id;
     @SerializedName("main")
     @Expose
     private String main;
@@ -25,7 +25,7 @@ public class Weather {
     /**
      * @return Weather condition id
      */
-    public long getId() {
+    public int getId() {
         return id;
     }
     /**
@@ -51,7 +51,7 @@ public class Weather {
         this.description = description;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 }

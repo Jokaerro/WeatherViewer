@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <string name="weather_temp">%1$.0f .. %2$.0f °C</string>
+   <string name="weather_humidity">Влажность %.0f</string>
+   <string name="weather_wind">Ветер %.1f м/с</string>
+   <string name="weather_pressure">Давление %.0f мм</string>
+</resources>
