@@ -1,6 +1,7 @@
 package pro.games_box.weatherviewer.ui.adapter.holder;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
@@ -33,6 +34,7 @@ public class CityHolder extends RecyclerView.ViewHolder {
     public final TextView weather_humidity;
     public final TextView weather_wind;
     public final TextView weather_pressure;
+    public final LinearLayout weather;
     public Context mContext;
 
     public CityHolder(View itemView) {
@@ -47,6 +49,7 @@ public class CityHolder extends RecyclerView.ViewHolder {
         weather_humidity = (TextView) itemView.findViewById(R.id.weather_humidity);
         weather_wind = (TextView) itemView.findViewById(R.id.weather_wind);
         weather_pressure = (TextView) itemView.findViewById(R.id.weather_pressure);
+        weather = (LinearLayout) itemView.findViewById(R.id.weather);
     }
 
     public void fill(final WeatherResponce weather) {

@@ -16,6 +16,8 @@ import pro.games_box.weatherviewer.db.WeatherContract;
 import pro.games_box.weatherviewer.model.response.WeatherResponce;
 import pro.games_box.weatherviewer.ui.activity.MainActivity;
 import pro.games_box.weatherviewer.ui.adapter.holder.CityHolder;
+import pro.games_box.weatherviewer.ui.fragment.ForecastFragment;
+import pro.games_box.weatherviewer.ui.fragment.WeatherFragment;
 
 /**
  * Created by Tesla on 07.04.2017.
@@ -30,8 +32,9 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
     private ChangeObservable mDataSetObserver;
     private DataMapper mDataMapper = new DataMapper();
     private WeatherApplication mApplication;
+    private WeatherFragment fragment;
 
-    public CityAdapter(Context context, Cursor data) {
+    public CityAdapter(Context context, Cursor data, WeatherFragment fragment) {
         // Конструктор адаптера, если прилетает не иницилизированный список инициализруем его
         mContext = context;
         mCursor = data;
@@ -42,6 +45,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
             mCursor.registerDataSetObserver(mDataSetObserver);
         }
         mApplication = WeatherApplication.getInstance();
+        this.fragment = fragment;;
     }
 
     @Override
@@ -94,7 +98,20 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
             @Override
             public void onClick(View view) {
                 if (mContext instanceof MainActivity) {
-                    ((MainActivity) mContext).weatherCall(weather);
+                    fragment.weatherCall(weather);
+//                    ((MainActivity) mContext).weatherCall(weather);
+                }
+            }
+        });
+        viewHolder.weather.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mContext instanceof MainActivity) {
+                    ((MainActivity) mContext).getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.root_layout, ForecastFragment.newInstance(weather.getBdCityName()), "forecast")
+                            .addToBackStack("weather")
+                            .commit();
                 }
             }
         });

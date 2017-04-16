@@ -77,10 +77,10 @@ public class CommonUtils {
         } else if (weatherId >= 600 && weatherId <= 622) {
             return context.getResources().getDrawable(R.drawable.weather_snow_scattered_day);
         } else if (weatherId >= 701 && weatherId <= 711) {
-            return context.getResources().getDrawable(R.drawable.weather_mist);}
-        else if (weatherId == 721) {
+            return context.getResources().getDrawable(R.drawable.weather_mist);
+        } else if (weatherId == 721) {
             return context.getResources().getDrawable(R.drawable.weather_haze);
-        } else if (weatherId == 731 || weatherId == 781) {
+        } else if (weatherId >= 731 && weatherId <= 781) {
             return context.getResources().getDrawable(R.drawable.weather_fog);
         } else if (weatherId == 800) {
             return context.getResources().getDrawable(R.drawable.weather_clear);

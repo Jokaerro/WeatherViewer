@@ -37,6 +37,8 @@
                     />
                 </LinearLayout>
             <LinearLayout
+                android:id="@+id/weather"
+                android:clickable="true"
                 android:layout_width="160dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
