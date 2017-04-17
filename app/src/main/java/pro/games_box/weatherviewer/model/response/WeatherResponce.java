@@ -174,6 +174,7 @@ public class WeatherResponce {
     @SerializedName("rain")
     @Expose
     private Rain rainInfo;
+
     @SerializedName("snow")
     @Expose
     private Snow snowInfo;

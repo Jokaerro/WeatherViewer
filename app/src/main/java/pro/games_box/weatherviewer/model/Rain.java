@@ -18,4 +18,8 @@ public class Rain {
     public Double getLast3hVolume() {
         return last3hVolume;
     }
+
+    public void setLast3hVolume(Double last3hVolume) {
+        this.last3hVolume = last3hVolume;
+    }
 }

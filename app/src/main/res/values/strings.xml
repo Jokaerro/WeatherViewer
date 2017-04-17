@@ -4,4 +4,5 @@
     <string name="action_add_city">Add</string>
     <string name="action_add_city_msg">Add a city to get weather</string>
     <string name="APIKEY">da2e10fa4e2557831b28f385c2f0f926</string>
+    <string name="pull2refresh">No data, please pull to refresh</string>
 </resources>

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.WeatherApplication;
+import pro.games_box.weatherviewer.db.CityContract;
 import pro.games_box.weatherviewer.db.DataMapper;
 import pro.games_box.weatherviewer.db.WeatherContract;
 import pro.games_box.weatherviewer.model.response.WeatherResponce;
@@ -24,7 +25,6 @@ import pro.games_box.weatherviewer.ui.fragment.WeatherFragment;
  */
 
 public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
-    //    private static List<WeatherResponce> mData;
     private final Context mContext;
     private Cursor mCursor;
     private boolean mDataValid;
@@ -45,7 +45,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
             mCursor.registerDataSetObserver(mDataSetObserver);
         }
         mApplication = WeatherApplication.getInstance();
-        this.fragment = fragment;;
+        this.fragment = fragment;
     }
 
     @Override
@@ -72,14 +72,14 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
         viewHolder.weather_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                view.getContext().getContentResolver().delete(WeatherContract.CityEntry.CONTENT_URI,
-                        WeatherContract.CityEntry.COLUMN_CITY_NAME + " == ?",
+                view.getContext().getContentResolver().delete(CityContract.CityEntry.CONTENT_URI,
+                        CityContract.CityEntry.COLUMN_CITY_NAME + " == ?",
                         new String[]{weather.getBdCityName()});
 
                 Cursor cursor = view.getContext().getContentResolver()
-                        .query(WeatherContract.CityEntry.buildCityWithLastWeather(),
-                                new String[]{"city."+ WeatherContract.CityEntry._ID,
-                                        WeatherContract.CityEntry.COLUMN_CITY_NAME,
+                        .query(CityContract.CityEntry.buildCityWithLastWeather(),
+                                new String[]{"city."+ CityContract.CityEntry._ID,
+                                        CityContract.CityEntry.COLUMN_CITY_NAME,
                                         WeatherContract.WeatherEntry.COLUMN_DATE,
                                         WeatherContract.WeatherEntry.COLUMN_DEGREES,
                                         WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
@@ -109,7 +109,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
                 if (mContext instanceof MainActivity) {
                     ((MainActivity) mContext).getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.root_layout, ForecastFragment.newInstance(weather.getBdCityName()), "forecast")
+                            .replace(R.id.root_layout, ForecastFragment.newInstance(weather.getBdCityId(), weather.getBdCityName()), "forecast")
                             .addToBackStack("weather")
                             .commit();
                 }

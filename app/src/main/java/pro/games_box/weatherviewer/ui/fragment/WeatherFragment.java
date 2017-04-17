@@ -19,13 +19,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.api.Api;
-import pro.games_box.weatherviewer.api.ErrorUtils;
 import pro.games_box.weatherviewer.db.WeatherContract;
-import pro.games_box.weatherviewer.model.response.Forecast;
+import pro.games_box.weatherviewer.db.CityContract;
 import pro.games_box.weatherviewer.model.response.WeatherResponce;
 import pro.games_box.weatherviewer.ui.activity.MainActivity;
 import pro.games_box.weatherviewer.ui.adapter.CityAdapter;
-import pro.games_box.weatherviewer.utils.ApiError;
 import pro.games_box.weatherviewer.utils.CommonUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,10 +47,10 @@ public class WeatherFragment extends BaseFragment implements Callback{
 
     // Projection and column indices values
     private static final String[] NOTIFY_CITY_PROJECTION = new String[]{
-            WeatherContract.CityEntry.COLUMN_CITY_SETTING,
-            WeatherContract.CityEntry.COLUMN_CITY_NAME,
-            WeatherContract.CityEntry.COLUMN_COORD_LAT,
-            WeatherContract.CityEntry.COLUMN_COORD_LONG
+            CityContract.CityEntry.COLUMN_CITY_SETTING,
+            CityContract.CityEntry.COLUMN_CITY_NAME,
+            CityContract.CityEntry.COLUMN_COORD_LAT,
+            CityContract.CityEntry.COLUMN_COORD_LONG
     };
 
     private static final int INDEX_CITY_SETTING = 0;
@@ -69,9 +67,9 @@ public class WeatherFragment extends BaseFragment implements Callback{
         Toolbar toolbar = ((MainActivity) getActivity()).mToolbar;
 
         Cursor cursor = getActivity().getContentResolver()
-                .query(WeatherContract.CityEntry.buildCityWithLastWeather(),
-                        new String[]{"city."+ WeatherContract.CityEntry._ID,
-                                WeatherContract.CityEntry.COLUMN_CITY_NAME,
+                .query(CityContract.CityEntry.buildCityWithLastWeather(),
+                        new String[]{"city."+ CityContract.CityEntry._ID,
+                                CityContract.CityEntry.COLUMN_CITY_NAME,
                                 WeatherContract.WeatherEntry.COLUMN_DATE,
                                 WeatherContract.WeatherEntry.COLUMN_DEGREES,
                                 WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
@@ -134,9 +132,9 @@ public class WeatherFragment extends BaseFragment implements Callback{
                         dialog.setOnDismissListener(null);
                         // Insert the new weather information into the database
                         ContentValues cityValue = new ContentValues();
-                        cityValue.put(WeatherContract.CityEntry.COLUMN_CITY_NAME, text);
+                        cityValue.put(CityContract.CityEntry.COLUMN_CITY_NAME, text);
                         dialog.getContext().getContentResolver()
-                                .insert(WeatherContract.CityEntry.CONTENT_URI, cityValue);
+                                .insert(CityContract.CityEntry.CONTENT_URI, cityValue);
                         notifyWeather();
                     }
                 });
@@ -145,9 +143,9 @@ public class WeatherFragment extends BaseFragment implements Callback{
 
     public void notifyWeather() {
         Cursor cursor = getActivity().getContentResolver()
-                .query(WeatherContract.CityEntry.buildCityWithLastWeather(),
-                        new String[]{"city."+ WeatherContract.CityEntry._ID,
-                                WeatherContract.CityEntry.COLUMN_CITY_NAME,
+                .query(CityContract.CityEntry.buildCityWithLastWeather(),
+                        new String[]{"city."+ CityContract.CityEntry._ID,
+                                CityContract.CityEntry.COLUMN_CITY_NAME,
                                 WeatherContract.WeatherEntry.COLUMN_DATE,
                                 WeatherContract.WeatherEntry.COLUMN_DEGREES,
                                 WeatherContract.WeatherEntry.COLUMN_HUMIDITY,

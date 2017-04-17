@@ -54,4 +54,8 @@ public class Weather {
     public void setId(int id) {
         this.id = id;
     }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
 }
