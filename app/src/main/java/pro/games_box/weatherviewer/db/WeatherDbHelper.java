@@ -14,7 +14,7 @@ import pro.games_box.weatherviewer.db.ForecastContract.ForecastEntry;
  */
 
 public class WeatherDbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 10;
     static final String DATABASE_NAME = "weather.db";
 
     public WeatherDbHelper(Context context) {
@@ -75,10 +75,9 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                 ForecastEntry.COLUMN_WIND_SPEED + " REAL NOT NULL, " +
                 ForecastEntry.COLUMN_WIND_DEGREES + " REAL NOT NULL, " +
 
-                ForecastEntry.COLUMN_DATETIME + " TEXT NOT NULL, " +
                 ForecastEntry.COLUMN_ICON + " TEXT NOT NULL, " +
-                ForecastEntry.COLUMN_RAIN + " REAL NOT NULL, " +
-                ForecastEntry.COLUMN_SNOW + " REAL NOT NULL, " +
+                ForecastEntry.COLUMN_RAIN + " REAL, " +
+                ForecastEntry.COLUMN_SNOW + " REAL, " +
 
                 // Set up the location column as a foreign key to location table.
                 " FOREIGN KEY (" + ForecastEntry.COLUMN_LOC_KEY + ") REFERENCES " +

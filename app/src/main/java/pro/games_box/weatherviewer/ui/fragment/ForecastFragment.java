@@ -3,6 +3,7 @@ package pro.games_box.weatherviewer.ui.fragment;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,6 +23,8 @@ import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.api.Api;
 import pro.games_box.weatherviewer.api.ErrorUtils;
 import pro.games_box.weatherviewer.db.ForecastContract;
+import pro.games_box.weatherviewer.model.Rain;
+import pro.games_box.weatherviewer.model.Snow;
 import pro.games_box.weatherviewer.model.response.ForecastResponse;
 import pro.games_box.weatherviewer.ui.activity.MainActivity;
 import pro.games_box.weatherviewer.ui.adapter.ForecastAdapter;
@@ -44,6 +47,7 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
 
     @BindView(R.id.city) TextView city_tv;
     @BindView(R.id.forecast_list) RecyclerView forecast_list;
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
     public static ForecastFragment newInstance(int cityId, String cityName) {
         final ForecastFragment fragment = new ForecastFragment();
@@ -80,6 +84,7 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
         forecast_list.setLayoutManager(llm);
 
         forecast_list.setAdapter(mForecastAdapter);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
         return rootView;
     }
 
@@ -106,8 +111,19 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
                     forecastValue.put(ForecastContract.ForecastEntry.COLUMN_PRESSURE, forecastResponse.getForecast().get(i).getMainConditions().getPressure());
                     forecastValue.put(ForecastContract.ForecastEntry.COLUMN_WIND_SPEED, forecastResponse.getForecast().get(i).getWind().getSpeed());
                     forecastValue.put(ForecastContract.ForecastEntry.COLUMN_WIND_DEGREES, forecastResponse.getForecast().get(i).getWind().getDegree());
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_RAIN, forecastResponse.getForecast().get(i).getRainInfo().getLast3hVolume());
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_SNOW, forecastResponse.getForecast().get(i).getSnowInfo().getLast3hVolume());
+
+                    Rain currentRain = forecastResponse.getForecast().get(i).getRainInfo();
+                    if(currentRain!=null)
+                        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_RAIN, forecastResponse.getForecast().get(i).getRainInfo().getLast3hVolume());
+                    else
+                        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_RAIN, " ");
+
+                    Snow currentSnow = forecastResponse.getForecast().get(i).getSnowInfo();
+                    if(currentSnow!=null)
+                        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_SNOW, forecastResponse.getForecast().get(i).getSnowInfo().getLast3hVolume());
+                    else
+                        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_SNOW, " ");
+
                     forecastValue.put(ForecastContract.ForecastEntry.COLUMN_ICON, forecastResponse.getForecast().get(i).getWeather().get(0).getIcon());
                     getActivity().getContentResolver()
                             .insert(ForecastContract.ForecastEntry.CONTENT_URI, forecastValue);
@@ -141,7 +157,14 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
 
     @Override
     public void onRefresh() {
-        forecastCall(city);
-        showToast("Swipe to refresh");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Отменяем анимацию обновления
+                mSwipeRefreshLayout.setRefreshing(false);
+                forecastCall(city);
+            }
+        }, 4000);
+
     }
 }

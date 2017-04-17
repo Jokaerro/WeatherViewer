@@ -59,7 +59,7 @@ public class DataMapper {
 
     public ForecastItem fromCursorForecast(Cursor cursor){
         ForecastItem forecast = new ForecastItem();
-        forecast.setDt_txt(cursor.getString(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_DATETIME)));
+        forecast.setDt_txt(cursor.getString(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_DATE)));
 
         Weather currentWeather = new Weather();
         List<Weather> weatherList = new ArrayList<>();
@@ -67,22 +67,27 @@ public class DataMapper {
         currentWeather.setId(cursor.getInt(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_WEATHER_ID)));
         currentWeather.setIcon(cursor.getString(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_ICON)));
         weatherList.add(currentWeather);
+        forecast.setWeather(weatherList);
 
         Rain rain = new Rain();
         rain.setLast3hVolume(cursor.getDouble(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_RAIN)));
+        forecast.setRainInfo(rain);
 
         Snow snow = new Snow();
         snow.setLast3hVolume(cursor.getDouble(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_SNOW)));
+        forecast.setSnowInfo(snow);
 
         Wind wind = new Wind();
         wind.setDegree(cursor.getDouble(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_WEATHER_ID)));
         wind.setSpeed(cursor.getDouble(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_WIND_SPEED)));
+        forecast.setWind(wind);
 
         Main mainConditions = new Main();
         mainConditions.setHumidity(cursor.getDouble(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_HUMIDITY)));
         mainConditions.setPressure(cursor.getDouble(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_PRESSURE)));
         mainConditions.setTempMax(cursor.getDouble(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_MAX_TEMP)));
         mainConditions.setTempMin(cursor.getDouble(cursor.getColumnIndex(ForecastContract.ForecastEntry.COLUMN_MIN_TEMP)));
+        forecast.setMainConditions(mainConditions);
 
         return forecast;
     }
