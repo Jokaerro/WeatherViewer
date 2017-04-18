@@ -22,6 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.api.Api;
+import pro.games_box.weatherviewer.db.DataMapper;
 import pro.games_box.weatherviewer.db.WeatherContract;
 import pro.games_box.weatherviewer.db.CityContract;
 import pro.games_box.weatherviewer.model.response.WeatherResponce;
@@ -41,6 +42,7 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
 
     private CityAdapter mCityAdapter;
     private Call<WeatherResponce> mWeatherResponseCall;
+    private DataMapper mDataMapper = new DataMapper();
 
     @BindView(R.id.relative_ll) RelativeLayout relative_ll;
     @BindView(R.id.city_list) RecyclerView city_recycler;
@@ -98,21 +100,10 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
             public void onResponse(Call<WeatherResponce> call, Response<WeatherResponce> response) {
                 if (call.equals(mWeatherResponseCall)) {
                     WeatherResponce weatherResponse = ((Response<WeatherResponce>) response).body();
-                    ContentValues weatherValue = new ContentValues();
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, weather.getBdCityId());
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_DATE, weatherResponse.getDatetime());
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, weatherResponse.getWeather().get(0).getDescription());
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherResponse.getWeather().get(0).getId());
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, weatherResponse.getMainConditions().getTempMin());
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, weatherResponse.getMainConditions().getTempMax());
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, weatherResponse.getMainConditions().getHumidity());
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, weatherResponse.getMainConditions().getPressure());
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, weatherResponse.getWind().getSpeed());
-                    weatherValue.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, weatherResponse.getWind().getDegree());
+                    ContentValues weatherValue = mDataMapper.fromWeatherResponse(weatherResponse, weather.getBdCityId());
                     getActivity().getContentResolver()
                             .insert(WeatherContract.WeatherEntry.CONTENT_URI, weatherValue);
                     notifyWeather();
-
                 }
             }
 
@@ -147,15 +138,7 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
 
     @Override
     public void onResponse(Call call, Response response) {
-        if (response.isSuccessful()) {
-//            if (call.equals(mForecastResponseCall)) {
-//            } else {
-//                ApiError error = ErrorUtils.parseError(response);
-//                String errorStr = "";
-//                if (error != null) errorStr = error.getDescription();
-//
-//            }
-        }
+
     }
 
     @Override

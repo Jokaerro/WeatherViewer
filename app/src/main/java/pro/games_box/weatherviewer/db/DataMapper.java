@@ -4,6 +4,7 @@ package pro.games_box.weatherviewer.db;
  * Created by Tesla on 12.04.2017.
  */
 
+import android.content.ContentValues;
 import android.database.Cursor;
 
 import java.util.ArrayList;
@@ -90,5 +91,51 @@ public class DataMapper {
         forecast.setMainConditions(mainConditions);
 
         return forecast;
+    }
+
+    public ContentValues fromForecastItem(ForecastItem forecast, String cityId){
+        ContentValues forecastValue = new ContentValues();
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_LOC_KEY, cityId);
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_DATETIME, forecast.getDatetime());
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_DATE, forecast.getDt_txt());
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_SHORT_DESC, forecast.getWeather().get(0).getDescription());
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_WEATHER_ID, forecast.getWeather().get(0).getId());
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_MIN_TEMP, forecast.getMainConditions().getTempMin());
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_MAX_TEMP, forecast.getMainConditions().getTempMax());
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_HUMIDITY, forecast.getMainConditions().getHumidity());
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_PRESSURE, forecast.getMainConditions().getPressure());
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_WIND_SPEED, forecast.getWind().getSpeed());
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_WIND_DEGREES, forecast.getWind().getDegree());
+
+        Rain currentRain = forecast.getRainInfo();
+        if(currentRain!=null)
+            forecastValue.put(ForecastContract.ForecastEntry.COLUMN_RAIN, forecast.getRainInfo().getLast3hVolume());
+        else
+            forecastValue.put(ForecastContract.ForecastEntry.COLUMN_RAIN, " ");
+
+        Snow currentSnow = forecast.getSnowInfo();
+        if(currentSnow!=null)
+            forecastValue.put(ForecastContract.ForecastEntry.COLUMN_SNOW, forecast.getSnowInfo().getLast3hVolume());
+        else
+            forecastValue.put(ForecastContract.ForecastEntry.COLUMN_SNOW, " ");
+
+        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_ICON, forecast.getWeather().get(0).getIcon());
+
+        return forecastValue;
+    }
+
+    public ContentValues fromWeatherResponse(WeatherResponce weatherResponse, int cityId){
+        ContentValues weatherValue = new ContentValues();
+        weatherValue.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, cityId);
+        weatherValue.put(WeatherContract.WeatherEntry.COLUMN_DATE, weatherResponse.getDatetime());
+        weatherValue.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, weatherResponse.getWeather().get(0).getDescription());
+        weatherValue.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherResponse.getWeather().get(0).getId());
+        weatherValue.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, weatherResponse.getMainConditions().getTempMin());
+        weatherValue.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, weatherResponse.getMainConditions().getTempMax());
+        weatherValue.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, weatherResponse.getMainConditions().getHumidity());
+        weatherValue.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, weatherResponse.getMainConditions().getPressure());
+        weatherValue.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, weatherResponse.getWind().getSpeed());
+        weatherValue.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, weatherResponse.getWind().getDegree());
+        return weatherValue;
     }
 }

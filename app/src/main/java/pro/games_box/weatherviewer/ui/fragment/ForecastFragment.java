@@ -26,6 +26,7 @@ import butterknife.ButterKnife;
 import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.api.Api;
 import pro.games_box.weatherviewer.api.ErrorUtils;
+import pro.games_box.weatherviewer.db.DataMapper;
 import pro.games_box.weatherviewer.db.ForecastContract;
 import pro.games_box.weatherviewer.model.Rain;
 import pro.games_box.weatherviewer.model.Snow;
@@ -49,6 +50,7 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
     private Call<ForecastResponse> mForecastResponseCall;
     private String city;
     private String cityId;
+    private DataMapper mDataMapper = new DataMapper();
 
     @BindView(R.id.city) TextView city_tv;
     @BindView(R.id.forecast_list) RecyclerView forecast_list;
@@ -96,32 +98,8 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
             if (call.equals(mForecastResponseCall)) {
                 ForecastResponse forecastResponse = ((Response<ForecastResponse>) response).body();
                 for(int i = 0; i < forecastResponse.getForecast().size(); i++) {
-                    ContentValues forecastValue = new ContentValues();
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_LOC_KEY, cityId);
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_DATETIME, forecastResponse.getForecast().get(i).getDatetime());
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_DATE, forecastResponse.getForecast().get(i).getDt_txt());
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_SHORT_DESC, forecastResponse.getForecast().get(i).getWeather().get(0).getDescription());
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_WEATHER_ID, forecastResponse.getForecast().get(i).getWeather().get(0).getId());
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_MIN_TEMP, forecastResponse.getForecast().get(i).getMainConditions().getTempMin());
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_MAX_TEMP, forecastResponse.getForecast().get(i).getMainConditions().getTempMax());
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_HUMIDITY, forecastResponse.getForecast().get(i).getMainConditions().getHumidity());
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_PRESSURE, forecastResponse.getForecast().get(i).getMainConditions().getPressure());
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_WIND_SPEED, forecastResponse.getForecast().get(i).getWind().getSpeed());
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_WIND_DEGREES, forecastResponse.getForecast().get(i).getWind().getDegree());
+                    ContentValues forecastValue = mDataMapper.fromForecastItem(forecastResponse.getForecast().get(i), cityId);
 
-                    Rain currentRain = forecastResponse.getForecast().get(i).getRainInfo();
-                    if(currentRain!=null)
-                        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_RAIN, forecastResponse.getForecast().get(i).getRainInfo().getLast3hVolume());
-                    else
-                        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_RAIN, " ");
-
-                    Snow currentSnow = forecastResponse.getForecast().get(i).getSnowInfo();
-                    if(currentSnow!=null)
-                        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_SNOW, forecastResponse.getForecast().get(i).getSnowInfo().getLast3hVolume());
-                    else
-                        forecastValue.put(ForecastContract.ForecastEntry.COLUMN_SNOW, " ");
-
-                    forecastValue.put(ForecastContract.ForecastEntry.COLUMN_ICON, forecastResponse.getForecast().get(i).getWeather().get(0).getIcon());
                     getActivity().getContentResolver()
                             .insert(ForecastContract.ForecastEntry.CONTENT_URI, forecastValue);
                 }
