@@ -138,4 +138,12 @@ public class DataMapper {
         weatherValue.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, weatherResponse.getWind().getDegree());
         return weatherValue;
     }
+
+    public String fromCursorGetCity(Cursor cursor){
+        return cursor.getString(cursor.getColumnIndex(CityContract.CityEntry.COLUMN_CITY_NAME));
+    }
+
+    public int fromCursorGetCityId(Cursor cursor){
+        return cursor.getInt(cursor.getColumnIndex(CityContract.CityEntry._ID));
+    }
 }

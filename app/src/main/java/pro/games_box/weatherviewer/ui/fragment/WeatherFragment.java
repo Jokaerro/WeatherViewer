@@ -1,6 +1,7 @@
 package pro.games_box.weatherviewer.ui.fragment;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -26,6 +27,7 @@ import pro.games_box.weatherviewer.db.DataMapper;
 import pro.games_box.weatherviewer.db.WeatherContract;
 import pro.games_box.weatherviewer.db.CityContract;
 import pro.games_box.weatherviewer.model.response.WeatherResponce;
+import pro.games_box.weatherviewer.service.WeatherSync;
 import pro.games_box.weatherviewer.ui.activity.MainActivity;
 import pro.games_box.weatherviewer.ui.adapter.CityAdapter;
 import pro.games_box.weatherviewer.utils.CommonUtils;
@@ -109,9 +111,18 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
 
             @Override
             public void onFailure(Call<WeatherResponce> call, Throwable t) {
-                showToast("onFail");
+                showToast("Response fail, check internet please");
             }
         });
+    }
+
+    private void onSyncWeather() {
+        Intent intent = new Intent(getContext(), WeatherSync.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(WeatherSync.TABLE, WeatherContract.WeatherEntry.TABLE_NAME);
+        bundle.putSerializable(WeatherSync.CITY_ID, 0);
+        intent.putExtra(WeatherSync.DATA_PARAM, bundle);
+        getContext().startService(intent);
     }
 
     @OnClick(R.id.fab)
@@ -133,6 +144,7 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
     }
 
     public void notifyWeather() {
+        onSyncWeather();
         getContext().getContentResolver().notifyChange(CityContract.CityEntry.buildCityWithLastWeather(), null, false);
     }
 
