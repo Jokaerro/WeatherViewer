@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Calendar;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -37,7 +41,8 @@ import retrofit2.Response;
  * Created by TESLA on 16.04.2017.
  */
 
-public class ForecastFragment extends BaseFragment implements Callback, SwipeRefreshLayout.OnRefreshListener{
+public class ForecastFragment extends BaseFragment implements Callback, SwipeRefreshLayout.OnRefreshListener, LoaderManager.LoaderCallbacks<Cursor>{
+    private static final int FORECAST_LOADER_ID = 11;
     public final static String CITY = "CITY";
     public final static String CITY_ID = "CITY_ID";
     private ForecastAdapter mForecastAdapter;
@@ -68,17 +73,9 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
         city_tv.setText(city);
         Toolbar toolbar = ((MainActivity) getActivity()).mToolbar;
 
-        Time time = new Time();
-        time.setToNow();
+        getLoaderManager().initLoader(FORECAST_LOADER_ID, null, this);
+        mForecastAdapter = new ForecastAdapter(getActivity(), null, ForecastFragment.this);
 
-        Cursor cursor = getActivity().getContentResolver()
-                .query(ForecastContract.ForecastEntry.buildWeatherCityWithStartDate(cityId, time.toMillis(false)),
-                        null,
-                        null,
-                        null,
-                        null);
-
-        mForecastAdapter = new ForecastAdapter(getActivity(), cursor, ForecastFragment.this);
         forecast_list.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         forecast_list.setLayoutManager(llm);
@@ -139,15 +136,9 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
     }
 
     public void notifyWeather() {
-        Time time = new Time();
-        time.setToNow();
-        Cursor cursor = getActivity().getContentResolver()
-                .query(ForecastContract.ForecastEntry.buildWeatherCityWithStartDate(cityId, time.toMillis(false)),
-                        null,
-                        null,
-                        null,
-                        null);
-        mForecastAdapter.swapCursor(cursor);
+        Calendar c = Calendar.getInstance();
+        long time = c.getTimeInMillis();
+        getContext().getContentResolver().notifyChange(ForecastContract.ForecastEntry.buildWeatherCityWithStartDate(cityId, time), null, false);
     }
 
     @Override
@@ -166,5 +157,31 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
             }
         }, 4000);
 
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if (id == FORECAST_LOADER_ID) {
+            Calendar c = Calendar.getInstance();
+            long time = c.getTimeInMillis();
+
+            return new CursorLoader(getContext(),
+                    ForecastContract.ForecastEntry.buildWeatherCityWithStartDate(cityId, time),
+                    null,
+                    null,
+                    null,
+                    null);
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mForecastAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mForecastAdapter.swapCursor(null);
     }
 }

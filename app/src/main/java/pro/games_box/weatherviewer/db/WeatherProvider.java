@@ -205,7 +205,6 @@ public class WeatherProvider extends ContentProvider {
             case WEATHER_WITH_CITY_AND_DATE:
                 return WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE;
             case WEATHER_WITH_CITY:
-                return WeatherContract.WeatherEntry.CONTENT_TYPE;
             case WEATHER:
                 return WeatherContract.WeatherEntry.CONTENT_TYPE;
             case CITY:
