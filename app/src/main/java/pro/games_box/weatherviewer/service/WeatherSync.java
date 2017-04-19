@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -30,10 +29,10 @@ import retrofit2.Response;
 public class WeatherSync extends IntentService {
     public static final String TABLE = "tableName";
     public static final String CITY_ID = "cityId";
-    public static final String DATA_PARAM = "data_param";
+    public static final String DATA_PARAM = "dataParam";
 
-    private Context mContext;
-    private DataMapper mDataMapper = new DataMapper();
+    private Context context;
+    private DataMapper dataMapper = new DataMapper();
 
     public WeatherSync() {
         super("WeatherSync");
@@ -48,7 +47,7 @@ public class WeatherSync extends IntentService {
         if(data == null){
             return;
         }
-        mContext = getApplicationContext();
+        context = getApplicationContext();
         onSync(data);
     }
 
@@ -66,13 +65,13 @@ public class WeatherSync extends IntentService {
             switch (tableName) {
                 case WeatherContract.WeatherEntry.TABLE_NAME:
                     onSyncWeather();
-                    mContext.getContentResolver().notifyChange(CityContract.CityEntry.buildCityWithLastWeather(), null, false);
+                    context.getContentResolver().notifyChange(CityContract.CityEntry.buildCityWithLastWeather(), null, false);
                     break;
                 case ForecastContract.ForecastEntry.TABLE_NAME:
                     onSyncForecast(cityId);
                     Calendar c = Calendar.getInstance();
                     long time = c.getTimeInMillis();
-                    mContext.getContentResolver().notifyChange(ForecastContract
+                    context.getContentResolver().notifyChange(ForecastContract
                             .ForecastEntry
                             .buildWeatherCityWithStartDate(String.format(Locale.US, "%d", cityId), time), null, false);
                     break;
@@ -103,19 +102,21 @@ public class WeatherSync extends IntentService {
 
     private boolean onSyncWeather() throws IOException {
         Cursor cursor;
-        cursor = mContext.getContentResolver().query(CityContract.CityEntry.buildCityWithLastWeather(),
+        cursor = context.getContentResolver().query(CityContract.CityEntry.buildCityWithLastWeather(),
                 CITY_PROJECTION,
                 null,
                 null,
                 null);
         while(cursor.moveToNext()) {
-            Call<WeatherResponce> call = Api.getApiService().getWeather(mDataMapper.fromCursorGetCity(cursor), "metric", "ru", mContext.getString(R.string.APIKEY));
+            Call<WeatherResponce> call = Api.getApiService().getWeather(dataMapper.fromCursorGetCity(cursor), "metric", "ru", context.getString(R.string.APIKEY));
             Response<WeatherResponce> response = call.execute();
             WeatherResponce weatherResponse = ((Response<WeatherResponce>) response).body();
-            int city = mDataMapper.fromCursorGetCityId(cursor);
-            ContentValues weatherValue = mDataMapper.fromWeatherResponse(weatherResponse, city);
-            mContext.getContentResolver()
-                    .insert(WeatherContract.WeatherEntry.CONTENT_URI, weatherValue);
+            int city = dataMapper.fromCursorGetCityId(cursor);
+            if(response.isSuccessful()) {
+                ContentValues weatherValue = dataMapper.fromWeatherResponse(weatherResponse, city);
+                context.getContentResolver()
+                        .insert(WeatherContract.WeatherEntry.CONTENT_URI, weatherValue);
+            }
         }
         cursor.close();
         return false;

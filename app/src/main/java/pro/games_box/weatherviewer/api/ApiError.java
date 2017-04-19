@@ -1,4 +1,4 @@
-package pro.games_box.weatherviewer.utils;
+package pro.games_box.weatherviewer.api;
 
 import com.google.gson.annotations.Expose;
 

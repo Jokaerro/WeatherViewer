@@ -13,7 +13,6 @@ import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.WeatherApplication;
 import pro.games_box.weatherviewer.db.DataMapper;
 import pro.games_box.weatherviewer.model.ForecastItem;
-import pro.games_box.weatherviewer.model.response.ForecastResponse;
 import pro.games_box.weatherviewer.ui.adapter.holder.ForecastHolder;
 import pro.games_box.weatherviewer.ui.fragment.ForecastFragment;
 
@@ -22,88 +21,86 @@ import pro.games_box.weatherviewer.ui.fragment.ForecastFragment;
  */
 
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastHolder>{
-    private final Context mContext;
-    private Cursor mCursor;
-    private boolean mDataValid;
-    private int mRowIdColumn;
-    private ForecastAdapter.ChangeObservable mDataSetObserver;
-    private DataMapper mDataMapper = new DataMapper();
-    private WeatherApplication mApplication;
+    private final Context context;
+    private Cursor cursor;
+    private boolean dataValid;
+    private int rowIdColumn;
+    private ForecastAdapter.ChangeObservable dataSetObserver;
+    private DataMapper dataMapper = new DataMapper();
+    private WeatherApplication application;
     private ForecastFragment fragment;
 
     public ForecastAdapter(Context context, Cursor data, ForecastFragment fragment) {
-        // Конструктор адаптера, если прилетает не иницилизированный список инициализруем его
-        mContext = context;
-        mCursor = data;
-        mDataValid = data != null;
-        mRowIdColumn = mDataValid ? mCursor.getColumnIndex(BaseColumns._ID) : -1;
-        mDataSetObserver = new ForecastAdapter.ChangeObservable();
-        if (mCursor != null) {
-            mCursor.registerDataSetObserver(mDataSetObserver);
+        this.context = context;
+        cursor = data;
+        dataValid = data != null;
+        rowIdColumn = dataValid ? cursor.getColumnIndex(BaseColumns._ID) : -1;
+        dataSetObserver = new ForecastAdapter.ChangeObservable();
+        if (cursor != null) {
+            cursor.registerDataSetObserver(dataSetObserver);
         }
-        mApplication = WeatherApplication.getInstance();
+        application = WeatherApplication.getInstance();
         this.fragment = fragment;
     }
 
     @Override
     public ForecastHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(mContext).inflate(R.layout.forecast_card, parent, false);
+        final View view = LayoutInflater.from(context).inflate(R.layout.forecast_card, parent, false);
         return new ForecastHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ForecastHolder holder, int position) {
-        if (!mDataValid) {
+        if (!dataValid) {
             throw new IllegalStateException("this should only be called when the cursor is valid");
         }
-        if (!mCursor.moveToPosition(position)) {
+        if (!cursor.moveToPosition(position)) {
             throw new IllegalStateException("couldn't move cursor to position " + position);
         }
-        onBindViewHolder(holder, mCursor);
+        onBindViewHolder(holder, cursor);
     }
     public void onBindViewHolder(ForecastHolder viewHolder, Cursor cursor) {
         final ForecastHolder holder = viewHolder;
-        final ForecastItem forecast = mDataMapper.fromCursorForecast(cursor);
+        final ForecastItem forecast = dataMapper.fromCursorForecast(cursor);
         viewHolder.fill(forecast);
     }
 
     @Override
     public int getItemCount() {
-        // Не забываем указать количество айтемов в списке
-        if (mDataValid && mCursor != null) {
-            return mCursor.getCount();
+        if (dataValid && cursor != null) {
+            return cursor.getCount();
         }
         return 0;
     }
 
     public Cursor swapCursor(Cursor newCursor) {
-        if (newCursor == mCursor) {
+        if (newCursor == cursor) {
             return null;
         }
-        final Cursor oldCursor = mCursor;
-        if (oldCursor != null && mDataSetObserver != null) {
-            oldCursor.unregisterDataSetObserver(mDataSetObserver);
+        final Cursor oldCursor = cursor;
+        if (oldCursor != null && dataSetObserver != null) {
+            oldCursor.unregisterDataSetObserver(dataSetObserver);
         }
-        mCursor = newCursor;
-        if (mCursor != null) {
-            if (mDataSetObserver != null) {
-                mCursor.registerDataSetObserver(mDataSetObserver);
+        cursor = newCursor;
+        if (cursor != null) {
+            if (dataSetObserver != null) {
+                cursor.registerDataSetObserver(dataSetObserver);
             }
-            mRowIdColumn = newCursor.getColumnIndexOrThrow(BaseColumns._ID);
-            mDataValid = true;
+            rowIdColumn = newCursor.getColumnIndexOrThrow(BaseColumns._ID);
+            dataValid = true;
             notifyDataSetChanged();
             notifyItemInserted(getItemCount());
         } else {
-            mRowIdColumn = -1;
-            mDataValid = false;
+            rowIdColumn = -1;
+            dataValid = false;
             notifyDataSetChanged();
         }
         return oldCursor;
     }
 
     protected Cursor getItemCursor(int position) {
-        if (mDataValid && mCursor != null && mCursor.moveToPosition(position)) {
-            return mCursor;
+        if (dataValid && cursor != null && cursor.moveToPosition(position)) {
+            return cursor;
         } else {
             return null;
         }
@@ -111,8 +108,8 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastHolder>{
 
     @Override
     public long getItemId(int position) {
-        if (mDataValid && mCursor != null && mCursor.moveToPosition(position)) {
-            return mCursor.getLong(mRowIdColumn);
+        if (dataValid && cursor != null && cursor.moveToPosition(position)) {
+            return cursor.getLong(rowIdColumn);
         }
         return 0;
     }

@@ -23,6 +23,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.api.Api;
+import pro.games_box.weatherviewer.api.ApiError;
+import pro.games_box.weatherviewer.api.ErrorUtils;
 import pro.games_box.weatherviewer.db.DataMapper;
 import pro.games_box.weatherviewer.db.WeatherContract;
 import pro.games_box.weatherviewer.db.CityContract;
@@ -81,7 +83,7 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
         View rootView = inflater.inflate(R.layout.fragment_weather, container, false);
         ButterKnife.bind(this, rootView);
 
-        Toolbar toolbar = ((MainActivity) getActivity()).mToolbar;
+        Toolbar toolbar = ((MainActivity) getActivity()).toolbar;
 
         getLoaderManager().initLoader(CITY_LOADER_ID, null, this);
         mCityAdapter = new CityAdapter(getActivity(), null, WeatherFragment.this);
@@ -102,9 +104,18 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
             public void onResponse(Call<WeatherResponce> call, Response<WeatherResponce> response) {
                 if (call.equals(mWeatherResponseCall)) {
                     WeatherResponce weatherResponse = ((Response<WeatherResponce>) response).body();
-                    ContentValues weatherValue = mDataMapper.fromWeatherResponse(weatherResponse, weather.getBdCityId());
-                    getActivity().getContentResolver()
-                            .insert(WeatherContract.WeatherEntry.CONTENT_URI, weatherValue);
+                    if(response.isSuccessful()) {
+                        ContentValues weatherValue = mDataMapper.fromWeatherResponse(weatherResponse, weather.getBdCityId());
+                        getActivity().getContentResolver()
+                                .insert(WeatherContract.WeatherEntry.CONTENT_URI, weatherValue);
+                    } else {
+                        ApiError error = ErrorUtils.parseError(response);
+
+                        getContext().getContentResolver().delete(CityContract.CityEntry.CONTENT_URI,
+                                CityContract.CityEntry.COLUMN_CITY_NAME + " == ?",
+                                new String[]{weather.getBdCityName()});
+                        showToast("Error: " + error.getMessage());
+                    }
                     notifyWeather();
                 }
             }

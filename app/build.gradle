@@ -32,9 +32,6 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
 
-    // Logging
-    compile 'com.jakewharton.timber:timber:4.3.1'
-
     // GSON with Retrofit
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.squareup.retrofit2:retrofit:2.2.0'

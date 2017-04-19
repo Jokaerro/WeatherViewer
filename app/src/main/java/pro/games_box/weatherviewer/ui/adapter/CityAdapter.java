@@ -25,51 +25,50 @@ import pro.games_box.weatherviewer.ui.fragment.WeatherFragment;
  */
 
 public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
-    private final Context mContext;
-    private Cursor mCursor;
-    private boolean mDataValid;
-    private int mRowIdColumn;
-    private ChangeObservable mDataSetObserver;
-    private DataMapper mDataMapper = new DataMapper();
-    private WeatherApplication mApplication;
+    private final Context context;
+    private Cursor cursor;
+    private boolean dataValid;
+    private int rowIdColumn;
+    private ChangeObservable dataSetObserver;
+    private DataMapper dataMapper = new DataMapper();
+    private WeatherApplication application;
     private WeatherFragment fragment;
 
     public CityAdapter(Context context, Cursor data, WeatherFragment fragment) {
-        // Конструктор адаптера, если прилетает не иницилизированный список инициализруем его
-        mContext = context;
-        mCursor = data;
-        mDataValid = data != null;
-        mRowIdColumn = mDataValid ? mCursor.getColumnIndex(BaseColumns._ID) : -1;
-        mDataSetObserver = new ChangeObservable();
-        if (mCursor != null) {
-            mCursor.registerDataSetObserver(mDataSetObserver);
+        this.context = context;
+        cursor = data;
+        dataValid = data != null;
+        rowIdColumn = dataValid ? cursor.getColumnIndex(BaseColumns._ID) : -1;
+        dataSetObserver = new ChangeObservable();
+        if (cursor != null) {
+            cursor.registerDataSetObserver(dataSetObserver);
         }
-        mApplication = WeatherApplication.getInstance();
+        application = WeatherApplication.getInstance();
         this.fragment = fragment;
     }
 
     @Override
     public CityHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(mContext).inflate(R.layout.city_card, parent, false);
+        final View view = LayoutInflater.from(context).inflate(R.layout.city_card, parent, false);
         return new CityHolder(view);
     }
 
     @Override
     public void onBindViewHolder(CityHolder holder, int position) {
-        if (!mDataValid) {
+        if (!dataValid) {
             throw new IllegalStateException("this should only be called when the cursor is valid");
         }
-        if (!mCursor.moveToPosition(position)) {
+        if (!cursor.moveToPosition(position)) {
             throw new IllegalStateException("couldn't move cursor to position " + position);
         }
-        onBindViewHolder(holder, mCursor);
+        onBindViewHolder(holder, cursor);
     }
 
     public void onBindViewHolder(CityHolder viewHolder, Cursor cursor) {
         final CityHolder holder = viewHolder;
-        final WeatherResponce weather = mDataMapper.fromCursorJoinCityAndWeather(cursor);
+        final WeatherResponce weather = dataMapper.fromCursorJoinCityAndWeather(cursor);
         viewHolder.fill(weather);
-        viewHolder.weather_delete.setOnClickListener(new View.OnClickListener() {
+        viewHolder.weatherDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 view.getContext().getContentResolver().delete(CityContract.CityEntry.CONTENT_URI,
@@ -94,20 +93,19 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
                 swapCursor(cursor);
             }
         });
-        viewHolder.weather_icon.setOnClickListener(new View.OnClickListener() {
+        viewHolder.weatherIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mContext instanceof MainActivity) {
+                if (context instanceof MainActivity) {
                     fragment.weatherCall(weather);
-//                    ((MainActivity) mContext).weatherCall(weather);
                 }
             }
         });
         viewHolder.weather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mContext instanceof MainActivity) {
-                    ((MainActivity) mContext).getSupportFragmentManager()
+                if (context instanceof MainActivity) {
+                    ((MainActivity) context).getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.root_layout, ForecastFragment.newInstance(weather.getBdCityId(), weather.getBdCityName()), "forecast")
                             .addToBackStack("weather")
@@ -118,7 +116,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
     }
 
     protected Cursor getCursor() {
-        return mCursor;
+        return cursor;
     }
 
     public void changeCursor(Cursor cursor) {
@@ -129,33 +127,33 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
     }
 
     public Cursor swapCursor(Cursor newCursor) {
-        if (newCursor == mCursor) {
+        if (newCursor == cursor) {
             return null;
         }
-        final Cursor oldCursor = mCursor;
-        if (oldCursor != null && mDataSetObserver != null) {
-            oldCursor.unregisterDataSetObserver(mDataSetObserver);
+        final Cursor oldCursor = cursor;
+        if (oldCursor != null && dataSetObserver != null) {
+            oldCursor.unregisterDataSetObserver(dataSetObserver);
         }
-        mCursor = newCursor;
-        if (mCursor != null) {
-            if (mDataSetObserver != null) {
-                mCursor.registerDataSetObserver(mDataSetObserver);
+        cursor = newCursor;
+        if (cursor != null) {
+            if (dataSetObserver != null) {
+                cursor.registerDataSetObserver(dataSetObserver);
             }
-            mRowIdColumn = newCursor.getColumnIndexOrThrow(BaseColumns._ID);
-            mDataValid = true;
+            rowIdColumn = newCursor.getColumnIndexOrThrow(BaseColumns._ID);
+            dataValid = true;
             notifyDataSetChanged();
             notifyItemInserted(getItemCount());
         } else {
-            mRowIdColumn = -1;
-            mDataValid = false;
+            rowIdColumn = -1;
+            dataValid = false;
             notifyDataSetChanged();
         }
         return oldCursor;
     }
 
     protected Cursor getItemCursor(int position) {
-        if (mDataValid && mCursor != null && mCursor.moveToPosition(position)) {
-            return mCursor;
+        if (dataValid && cursor != null && cursor.moveToPosition(position)) {
+            return cursor;
         } else {
             return null;
         }
@@ -163,17 +161,16 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
 
     @Override
     public long getItemId(int position) {
-        if (mDataValid && mCursor != null && mCursor.moveToPosition(position)) {
-            return mCursor.getLong(mRowIdColumn);
+        if (dataValid && cursor != null && cursor.moveToPosition(position)) {
+            return cursor.getLong(rowIdColumn);
         }
         return 0;
     }
 
     @Override
     public int getItemCount() {
-        // Не забываем указать количество айтемов в списке
-        if (mDataValid && mCursor != null) {
-            return mCursor.getCount();
+        if (dataValid && cursor != null) {
+            return cursor.getCount();
         }
         return 0;
     }

@@ -29,24 +29,4 @@
         android:id="@+id/root_layout"
         android:orientation="vertical"
         />
-    <!--<RelativeLayout-->
-    <!--android:id="@+id/relative_ll"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--&gt;-->
-    <!--<android.support.v7.widget.RecyclerView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:id="@+id/city_list"-->
-    <!--/>-->
-    <!--<android.support.design.widget.FloatingActionButton-->
-    <!--android:id="@+id/fab"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_margin="@dimen/fab_margin"-->
-    <!--app:srcCompat="@drawable/ic_add"-->
-    <!--android:layout_alignParentBottom="true"-->
-    <!--android:layout_alignParentRight="true"-->
-    <!--/>-->
-    <!--</RelativeLayout>-->
 </LinearLayout>

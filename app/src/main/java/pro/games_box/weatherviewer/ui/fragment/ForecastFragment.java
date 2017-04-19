@@ -12,7 +12,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,12 +27,10 @@ import pro.games_box.weatherviewer.api.Api;
 import pro.games_box.weatherviewer.api.ErrorUtils;
 import pro.games_box.weatherviewer.db.DataMapper;
 import pro.games_box.weatherviewer.db.ForecastContract;
-import pro.games_box.weatherviewer.model.Rain;
-import pro.games_box.weatherviewer.model.Snow;
 import pro.games_box.weatherviewer.model.response.ForecastResponse;
 import pro.games_box.weatherviewer.ui.activity.MainActivity;
 import pro.games_box.weatherviewer.ui.adapter.ForecastAdapter;
-import pro.games_box.weatherviewer.utils.ApiError;
+import pro.games_box.weatherviewer.api.ApiError;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -46,15 +43,15 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
     private static final int FORECAST_LOADER_ID = 11;
     public final static String CITY = "CITY";
     public final static String CITY_ID = "CITY_ID";
-    private ForecastAdapter mForecastAdapter;
-    private Call<ForecastResponse> mForecastResponseCall;
+    private ForecastAdapter forecastAdapter;
+    private Call<ForecastResponse> forecastResponseCall;
     private String city;
     private String cityId;
-    private DataMapper mDataMapper = new DataMapper();
+    private DataMapper dataMapper = new DataMapper();
 
-    @BindView(R.id.city) TextView city_tv;
-    @BindView(R.id.forecast_list) RecyclerView forecast_list;
-    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.city) TextView cityTv;
+    @BindView(R.id.forecast_list) RecyclerView forecastRecycler;
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
 
     public static ForecastFragment newInstance(int cityId, String cityName) {
         final ForecastFragment fragment = new ForecastFragment();
@@ -72,51 +69,52 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
         ButterKnife.bind(this, rootView);
         city = getArguments().getString(CITY);
         cityId = String.format(Locale.US, "%d", getArguments().getInt(CITY_ID));
-        city_tv.setText(city);
-        Toolbar toolbar = ((MainActivity) getActivity()).mToolbar;
+        cityTv.setText(city);
+        Toolbar toolbar = ((MainActivity) getActivity()).toolbar;
 
         getLoaderManager().initLoader(FORECAST_LOADER_ID, null, this);
-        mForecastAdapter = new ForecastAdapter(getActivity(), null, ForecastFragment.this);
+        forecastAdapter = new ForecastAdapter(getActivity(), null, ForecastFragment.this);
 
-        forecast_list.setHasFixedSize(true);
+        forecastRecycler.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        forecast_list.setLayoutManager(llm);
+        forecastRecycler.setLayoutManager(llm);
 
-        forecast_list.setAdapter(mForecastAdapter);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+        forecastRecycler.setAdapter(forecastAdapter);
+        swipeRefreshLayout.setOnRefreshListener(this);
         return rootView;
     }
 
     private void forecastCall(String city) {
-        mForecastResponseCall = Api.getApiService().getForecast(city, "38", "metric", "ru", getString(R.string.APIKEY));
-        mForecastResponseCall.enqueue(this);
+        forecastResponseCall = Api.getApiService().getForecast(city, "38", "metric", "ru", getString(R.string.APIKEY));
+        forecastResponseCall.enqueue(this);
     }
 
     @Override
     public void onResponse(Call call, Response response) {
         if (response.isSuccessful()) {
-            if (call.equals(mForecastResponseCall)) {
+            if (call.equals(forecastResponseCall)) {
                 ForecastResponse forecastResponse = ((Response<ForecastResponse>) response).body();
-                for(int i = 0; i < forecastResponse.getForecast().size(); i++) {
-                    ContentValues forecastValue = mDataMapper.fromForecastItem(forecastResponse.getForecast().get(i), cityId);
+                for (int i = 0; i < forecastResponse.getForecast().size(); i++) {
+                    ContentValues forecastValue = dataMapper.fromForecastItem(forecastResponse.getForecast().get(i), cityId);
 
-                    getActivity().getContentResolver()
+                    if(getActivity() != null)
+                        getActivity().getContentResolver()
                             .insert(ForecastContract.ForecastEntry.CONTENT_URI, forecastValue);
                 }
                 notifyWeather();
-            } else {
-                ApiError error = ErrorUtils.parseError(response);
-                String errorStr = "";
-                if (error != null) errorStr = error.getDescription();
-
             }
+        } else {
+            ApiError error = ErrorUtils.parseError(response);
+            if (error != null)
+                showToast(error.getMessage());
         }
     }
 
     public void notifyWeather() {
         Calendar c = Calendar.getInstance();
         long time = c.getTimeInMillis();
-        getContext().getContentResolver().notifyChange(ForecastContract.ForecastEntry.buildWeatherCityWithStartDate(cityId, time), null, false);
+        if(getContext() != null)
+            getContext().getContentResolver().notifyChange(ForecastContract.ForecastEntry.buildWeatherCityWithStartDate(cityId, time), null, false);
     }
 
     @Override
@@ -130,8 +128,10 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
             @Override
             public void run() {
                 // Отменяем анимацию обновления
-                mSwipeRefreshLayout.setRefreshing(false);
-                forecastCall(city);
+                swipeRefreshLayout.setRefreshing(false);
+                if(isAdded()) {
+                    forecastCall(city);
+                }
             }
         }, 4000);
 
@@ -155,11 +155,11 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mForecastAdapter.swapCursor(data);
+        forecastAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mForecastAdapter.swapCursor(null);
+        forecastAdapter.swapCursor(null);
     }
 }

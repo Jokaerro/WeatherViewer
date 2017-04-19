@@ -3,7 +3,6 @@ package pro.games_box.weatherviewer.api;
 import java.lang.annotation.Annotation;
 
 import okhttp3.ResponseBody;
-import pro.games_box.weatherviewer.utils.ApiError;
 import retrofit2.Converter;
 import retrofit2.Response;
 

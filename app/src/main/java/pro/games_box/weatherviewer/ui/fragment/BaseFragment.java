@@ -9,7 +9,7 @@ import pro.games_box.weatherviewer.ui.activity.BaseActivity;
  * Created by TESLA on 16.04.2017.
  */
 
-public class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment {
 
     protected BaseActivity getParentCompat() {
         return (BaseActivity) getActivity();
