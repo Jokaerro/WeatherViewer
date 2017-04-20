@@ -1,5 +1,6 @@
 package pro.games_box.weatherviewer.api;
 
+import pro.games_box.weatherviewer.model.response.DailyForecastResponse;
 import pro.games_box.weatherviewer.model.response.ForecastResponse;
 import pro.games_box.weatherviewer.model.response.WeatherResponce;
 import retrofit2.Call;
@@ -23,4 +24,11 @@ public interface IEndpoint {
                                        @Query("units") String unit,
                                        @Query("lang") String lang,
                                        @Query("appid") String apikey);
+
+    @GET("forecast/daily")
+    Call<DailyForecastResponse> getDaily(@Query("q") String city,
+                                         @Query("cnt") String limit,
+                                         @Query("units") String unit,
+                                         @Query("lang") String lang,
+                                         @Query("appid") String apikey);
 }

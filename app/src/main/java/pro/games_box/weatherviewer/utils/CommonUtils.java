@@ -12,6 +12,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import pro.games_box.weatherviewer.R;
 
 /**
@@ -92,5 +94,14 @@ public class CommonUtils {
             return context.getResources().getDrawable(R.drawable.weather_wind);
         }
         return context.getResources().getDrawable(R.drawable.weather_none_available);
+    }
+
+    public static String getTempWithSign(Double temp){
+        String result = "";
+        if (temp > 0)
+            result = "+" + String.format(Locale.US, "%.0f", temp);
+        else
+            result = String.format(Locale.US, "%.0f", temp);
+        return result;
     }
 }

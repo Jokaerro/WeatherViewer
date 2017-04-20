@@ -30,7 +30,7 @@ public class ForecastHolder extends RecyclerView.ViewHolder{
     @BindView(R.id.forecast_pressure) TextView forecastPressure;
     @BindView(R.id.forecast_rain) TextView forecastRain;
     @BindView(R.id.forecast_snow) TextView forecastSnow;
-    @BindView(R.id.forecast_winddegree) TextView forecastWinddegree;
+//    @BindView(R.id.forecast_winddegree) TextView forecastWinddegree;
     public Context context;
     public ForecastHolder(View itemView) {
         super(itemView);
@@ -50,23 +50,26 @@ public class ForecastHolder extends RecyclerView.ViewHolder{
             signMax = String.format(Locale.US, "%.0f", forecastItem.getMainConditions().getTempMax());
         forecastTemperature.setText(signMin + " .. " + signMax);
         forecastDescription.setText(forecastItem.getWeather().get(0).getDescription());
-        forecastDatetime.setText(forecastItem.getDt_txt().toString());
-        forecastHumidity.setText(String.format(Locale.US,  context.getString(R.string.weather_humidity),
-                forecastItem.getMainConditions().getHumidity()) + "%");
+        forecastDatetime.setText(forecastItem.getDt_txt());
+
+        String strHumidity =String.format(Locale.US,  context.getString(R.string.weather_humidity),
+                forecastItem.getMainConditions().getHumidity()) + "%";
+        forecastHumidity.setText(strHumidity);
+
         forecastWindspeed.setText(String.format(Locale.US,  context.getString(R.string.weather_wind),
                 forecastItem.getWind().getSpeed()));
         forecastPressure.setText(String.format(Locale.US,  context.getString(R.string.weather_pressure),
                 forecastItem.getMainConditions().getPressure()));
 
         if(!CommonUtils.isEmptyOrNull(forecastItem.getRainInfo().getLast3hVolume().toString()))
-            forecastRain.setText(String.format("Дождь %f мм", forecastItem.getRainInfo().getLast3hVolume()));
+            forecastRain.setText(String.format(context.getString(R.string.weather_rain), forecastItem.getRainInfo().getLast3hVolume()));
         else
             forecastRain.setVisibility(View.GONE);
 
         if(!CommonUtils.isEmptyOrNull(forecastItem.getSnowInfo().getLast3hVolume().toString()))
-            forecastRain.setText(String.format("Снег %f мм", forecastItem.getRainInfo().getLast3hVolume()));
+            forecastSnow.setText(String.format(context.getString(R.string.weather_rain), forecastItem.getRainInfo().getLast3hVolume()));
         else
-            forecastRain.setVisibility(View.GONE);
+            forecastSnow.setVisibility(View.GONE);
 
         String internetUrl = "http://openweathermap.org/img/w/" + forecastItem.getWeather().get(0).getIcon() + ".png";
         Picasso.with(context).load(internetUrl).into(forecastIcon);

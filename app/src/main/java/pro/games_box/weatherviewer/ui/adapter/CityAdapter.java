@@ -17,6 +17,7 @@ import pro.games_box.weatherviewer.db.WeatherContract;
 import pro.games_box.weatherviewer.model.response.WeatherResponce;
 import pro.games_box.weatherviewer.ui.activity.MainActivity;
 import pro.games_box.weatherviewer.ui.adapter.holder.CityHolder;
+import pro.games_box.weatherviewer.ui.fragment.DailyFragment;
 import pro.games_box.weatherviewer.ui.fragment.ForecastFragment;
 import pro.games_box.weatherviewer.ui.fragment.WeatherFragment;
 
@@ -102,6 +103,18 @@ public class CityAdapter extends RecyclerView.Adapter<CityHolder> {
             }
         });
         viewHolder.weather.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (context instanceof MainActivity) {
+                    ((MainActivity) context).getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.root_layout, DailyFragment.newInstance(weather.getBdCityId(), weather.getBdCityName()), "daily")
+                            .addToBackStack("weather")
+                            .commit();
+                }
+            }
+        });
+        viewHolder.conditions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (context instanceof MainActivity) {

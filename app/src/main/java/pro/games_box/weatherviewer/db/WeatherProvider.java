@@ -24,14 +24,15 @@ public class WeatherProvider extends ContentProvider {
     static final int CITY = 300;
     static final int CITY_WITH_LAST_WEATHER = 301;
     static final int FORECAST = 400;
+    static final int DAILY = 500;
 
-    private static final SQLiteQueryBuilder sWeatherByLocationSettingQueryBuilder;
+    private static final SQLiteQueryBuilder weatherByLocationSettingQueryBuilder;
 
     static{
-        sWeatherByLocationSettingQueryBuilder = new SQLiteQueryBuilder();
+        weatherByLocationSettingQueryBuilder = new SQLiteQueryBuilder();
 
         /** weather INNER JOIN location ON weather.location_id = location._id */
-        sWeatherByLocationSettingQueryBuilder.setTables(
+        weatherByLocationSettingQueryBuilder.setTables(
                 ForecastContract.ForecastEntry.TABLE_NAME + " INNER JOIN " +
                         CityContract.CityEntry.TABLE_NAME +
                         " ON " + ForecastContract.ForecastEntry.TABLE_NAME +
@@ -40,12 +41,27 @@ public class WeatherProvider extends ContentProvider {
                         "." + CityContract.CityEntry._ID);
     }
 
-    private static final SQLiteQueryBuilder sCitiesWithWeatherSettingQueryBuilder;
+    private static final SQLiteQueryBuilder dailyWeatherByLocationQueryBuilder;
+
     static{
-        sCitiesWithWeatherSettingQueryBuilder = new SQLiteQueryBuilder();
+        dailyWeatherByLocationQueryBuilder = new SQLiteQueryBuilder();
+
+        /** weather INNER JOIN location ON weather.location_id = location._id */
+        dailyWeatherByLocationQueryBuilder.setTables(
+                DailyContract.DailyEntry.TABLE_NAME + " INNER JOIN " +
+                        CityContract.CityEntry.TABLE_NAME +
+                        " ON " + DailyContract.DailyEntry.TABLE_NAME +
+                        "." + DailyContract.DailyEntry.COLUMN_LOC_KEY +
+                        " = " + CityContract.CityEntry.TABLE_NAME +
+                        "." + CityContract.CityEntry._ID);
+    }
+
+    private static final SQLiteQueryBuilder citiesWithWeatherSettingQueryBuilder;
+    static{
+        citiesWithWeatherSettingQueryBuilder = new SQLiteQueryBuilder();
     /* SELECT * from city left JOIN weather ON  weather._LOC_KEY = city._id GROUP BY city_name order by _DATE DESC*/
         /** weather INNER JOIN location ON weather.location_id = location._id */
-        sCitiesWithWeatherSettingQueryBuilder.setTables(
+        citiesWithWeatherSettingQueryBuilder.setTables(
                 CityContract.CityEntry.TABLE_NAME + " LEFT JOIN " +
                         WeatherContract.WeatherEntry.TABLE_NAME +
                         " ON " + WeatherContract.WeatherEntry.TABLE_NAME +
@@ -54,21 +70,27 @@ public class WeatherProvider extends ContentProvider {
                         "." + CityContract.CityEntry._ID);
     }
 
-    private static final String sLocationSettingSelection =
+    private static final String locationSettingSelection =
             CityContract.CityEntry.TABLE_NAME+
                     "." + CityContract.CityEntry.COLUMN_CITY_SETTING + " = ? ";
 
-    private static final String sCityWithStartDateSelection =
+    private static final String cityWithStartDateSelection =
             CityContract.CityEntry.TABLE_NAME+
                     "." + CityContract.CityEntry._ID + " = ? AND " +
                     ForecastContract.ForecastEntry.COLUMN_DATE + " >= ? ";
 
-    private static final String sLocationSettingAndDaySelection =
+    private static final String cityWithStartDateEndDateSelection =
+            CityContract.CityEntry.TABLE_NAME+
+                    "." + CityContract.CityEntry._ID + " = ? AND " +
+                    DailyContract.DailyEntry.COLUMN_DATE + " >= ? AND " +
+                    DailyContract.DailyEntry.COLUMN_DATE + " <= ?";
+
+    private static final String locationSettingAndDaySelection =
             CityContract.CityEntry.TABLE_NAME +
                     "." + CityContract.CityEntry.COLUMN_CITY_SETTING + " = ? AND " +
                     WeatherContract.WeatherEntry.COLUMN_DATE + " = ? ";
 
-    private static final String sCityWithLastWeatherSelection =
+    private static final String cityWithLastWeatherSelection =
             CityContract.CityEntry.TABLE_NAME + "." + CityContract.CityEntry.COLUMN_CITY_NAME
                     + "";
 
@@ -79,9 +101,29 @@ public class WeatherProvider extends ContentProvider {
         String[] selectionArgs;
         String selection;
         selectionArgs = new String[]{locationSetting, Long.toString(startDate)};
-        selection = sCityWithStartDateSelection;
+        selection = cityWithStartDateSelection;
 
-        return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return weatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getDailyWeather(Uri uri, String[] projection, String sortOrder) {
+        String locationSetting = DailyContract.DailyEntry.getCityIdFromUri(uri);
+        long startDate = DailyContract.DailyEntry.getStartDateFromUri(uri);
+        long endDate = DailyContract.DailyEntry.getEndDateFromUri(uri);
+
+        String[] selectionArgs;
+        String selection;
+        selectionArgs = new String[]{locationSetting, Long.toString(startDate), Long.toString(endDate)};
+        selection = cityWithStartDateEndDateSelection;
+
+        return dailyWeatherByLocationQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -93,7 +135,7 @@ public class WeatherProvider extends ContentProvider {
 
     private Cursor getCitiesWithLastWeather(Uri uri, String[] projection,  String selection,
                                             String[] selectionArgs,  String sortOrder){
-        return sCitiesWithWeatherSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return citiesWithWeatherSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -107,9 +149,9 @@ public class WeatherProvider extends ContentProvider {
         String locationSetting = WeatherContract.WeatherEntry.getCitySettingFromUri(uri);
         long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
 
-        return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return weatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
-                sLocationSettingAndDaySelection,
+                locationSettingAndDaySelection,
                 new String[]{locationSetting, Long.toString(date)},
                 null,
                 null,
@@ -130,6 +172,8 @@ public class WeatherProvider extends ContentProvider {
         matcher.addURI(authority, CityContract.PATH_CITY_WITH_LAST_WEATHER, CITY_WITH_LAST_WEATHER);
 
         matcher.addURI(authority, ForecastContract.PATH_FORECAST, FORECAST);
+
+        matcher.addURI(authority, DailyContract.PATH_DAILY, DAILY);
 
         return matcher;
     }
@@ -160,6 +204,11 @@ public class WeatherProvider extends ContentProvider {
             // "forecast/*"
             case FORECAST: {
                 retCursor = getWeatherByLocationSetting(uri, projection, sortOrder);
+                break;
+            }
+            // "daily/*"
+            case DAILY: {
+                retCursor = getDailyWeather(uri, projection, sortOrder);
                 break;
             }
             // "weather"
@@ -213,6 +262,8 @@ public class WeatherProvider extends ContentProvider {
                 return CityContract.CityEntry.CONTENT_ITEM_TYPE;
             case FORECAST:
                 return ForecastContract.ForecastEntry.CONTENT_ITEM_TYPE;
+            case DAILY:
+                return DailyContract.DailyEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -251,6 +302,14 @@ public class WeatherProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            case DAILY: {
+                long _id = db.insert(DailyContract.DailyEntry.TABLE_NAME, null, contentValues);
+                if ( _id > 0 )
+                    returnUri = DailyContract.DailyEntry.buildWeatherUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -277,6 +336,10 @@ public class WeatherProvider extends ContentProvider {
             case FORECAST:
                 rowsDeleted = db.delete(
                         ForecastContract.ForecastEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case DAILY:
+                rowsDeleted = db.delete(
+                        DailyContract.DailyEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -315,6 +378,10 @@ public class WeatherProvider extends ContentProvider {
                 break;
             case FORECAST:
                 rowsUpdated = db.update(ForecastContract.ForecastEntry.TABLE_NAME, contentValues, selection,
+                        selectionArgs);
+                break;
+            case DAILY:
+                rowsUpdated = db.update(DailyContract.DailyEntry.TABLE_NAME, contentValues, selection,
                         selectionArgs);
                 break;
             default:

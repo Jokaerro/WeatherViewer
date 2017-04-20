@@ -74,6 +74,7 @@
                     />
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/conditions"
                 android:layout_width="110dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical"

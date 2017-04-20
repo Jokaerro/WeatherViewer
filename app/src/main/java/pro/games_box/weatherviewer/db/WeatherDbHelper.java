@@ -8,13 +8,14 @@ import android.provider.BaseColumns;
 import pro.games_box.weatherviewer.db.CityContract.CityEntry;
 import pro.games_box.weatherviewer.db.WeatherContract.WeatherEntry;
 import pro.games_box.weatherviewer.db.ForecastContract.ForecastEntry;
+import pro.games_box.weatherviewer.db.DailyContract.DailyEntry;
 
 /**
  * Created by TESLA on 07.04.2017.
  */
 
 public class WeatherDbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 13;
+    private static final int DATABASE_VERSION = 14;
     static final String DATABASE_NAME = "weather.db";
 
     public WeatherDbHelper(Context context) {
@@ -88,9 +89,44 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                 " UNIQUE (" + ForecastEntry.COLUMN_DATE + ", " +
                 ForecastEntry.COLUMN_LOC_KEY + ") ON CONFLICT REPLACE);";
 
+        final String SQL_CREATE_DAILY_TABLE = "CREATE TABLE " + DailyEntry.TABLE_NAME + " (" +
+                BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+
+                // the ID of the location entry associated with this weather data
+                DailyEntry.COLUMN_LOC_KEY + " INTEGER NOT NULL, " +
+                DailyEntry.COLUMN_DATE + " INTEGER NOT NULL, " +
+                DailyEntry.COLUMN_SHORT_DESC + " TEXT NOT NULL, " +
+                DailyEntry.COLUMN_WEATHER_ID + " INTEGER NOT NULL," +
+
+                DailyEntry.COLUMN_MIN_TEMP + " REAL NOT NULL, " +
+                DailyEntry.COLUMN_MAX_TEMP + " REAL NOT NULL, " +
+                DailyEntry.COLUMN_MOR_TEMP+ " REAL NOT NULL, " +
+                DailyEntry.COLUMN_DAY_TEMP + " REAL NOT NULL, " +
+                DailyEntry.COLUMN_EVE_TEMP + " REAL NOT NULL, " +
+                DailyEntry.COLUMN_NIGHT_TEMP + " REAL NOT NULL, " +
+
+                DailyEntry.COLUMN_HUMIDITY + " REAL NOT NULL, " +
+                DailyEntry.COLUMN_PRESSURE + " REAL NOT NULL, " +
+                DailyEntry.COLUMN_WIND_SPEED + " REAL NOT NULL, " +
+                DailyEntry.COLUMN_WIND_DEGREES + " REAL NOT NULL, " +
+
+                DailyEntry.COLUMN_ICON + " TEXT NOT NULL, " +
+                DailyEntry.COLUMN_RAIN + " REAL, " +
+                DailyEntry.COLUMN_SNOW + " REAL, " +
+
+                // Set up the location column as a foreign key to location table.
+                " FOREIGN KEY (" + ForecastEntry.COLUMN_LOC_KEY + ") REFERENCES " +
+                CityEntry.TABLE_NAME + " (" + CityEntry._ID + "), " +
+
+                // To assure the application have just one weather entry per day
+                // per location, it's created a UNIQUE constraint with REPLACE strategy
+                " UNIQUE (" + ForecastEntry.COLUMN_DATE + ", " +
+                ForecastEntry.COLUMN_LOC_KEY + ") ON CONFLICT REPLACE);";
+
         sqLiteDatabase.execSQL(SQL_CREATE_LOCATION_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_FORECAST_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_DAILY_TABLE);
         sqLiteDatabase.execSQL("insert into " + CityEntry.TABLE_NAME +" values (1,'','Москва','','');");
         sqLiteDatabase.execSQL("insert into " + CityEntry.TABLE_NAME +" values (2,'','Санкт-Петербург','','');");
 
@@ -101,6 +137,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CityEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + WeatherEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ForecastEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + DailyEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }

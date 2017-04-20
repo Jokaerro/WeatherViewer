@@ -44,12 +44,12 @@ import retrofit2.Response;
 public class WeatherFragment extends BaseFragment implements Callback, LoaderManager.LoaderCallbacks<Cursor>{
     private static final int CITY_LOADER_ID = 10;
 
-    private CityAdapter mCityAdapter;
-    private Call<WeatherResponce> mWeatherResponseCall;
-    private DataMapper mDataMapper = new DataMapper();
+    private CityAdapter cityAdapter;
+    private Call<WeatherResponce> weatherResponseCall;
+    private DataMapper dataMapper = new DataMapper();
 
-    @BindView(R.id.relative_ll) RelativeLayout relative_ll;
-    @BindView(R.id.city_list) RecyclerView city_recycler;
+    @BindView(R.id.relative_ll) RelativeLayout relativelayout;
+    @BindView(R.id.city_list) RecyclerView cityRecycler;
 
     public static WeatherFragment newInstance() {
         final WeatherFragment fragment = new WeatherFragment();
@@ -86,26 +86,26 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
         Toolbar toolbar = ((MainActivity) getActivity()).toolbar;
 
         getLoaderManager().initLoader(CITY_LOADER_ID, null, this);
-        mCityAdapter = new CityAdapter(getActivity(), null, WeatherFragment.this);
+        cityAdapter = new CityAdapter(getActivity(), null, WeatherFragment.this);
 
-        city_recycler.setHasFixedSize(true);
+        cityRecycler.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        city_recycler.setLayoutManager(llm);
+        cityRecycler.setLayoutManager(llm);
 
-        city_recycler.setAdapter(mCityAdapter);
+        cityRecycler.setAdapter(cityAdapter);
 
         return rootView;
     }
 
     public void weatherCall(final WeatherResponce weather) {
-        mWeatherResponseCall = Api.getApiService().getWeather(weather.getBdCityName(), "metric", "ru", getString(R.string.APIKEY));
-        mWeatherResponseCall.enqueue(new Callback<WeatherResponce>() {
+        weatherResponseCall = Api.getApiService().getWeather(weather.getBdCityName(), "metric", "ru", getString(R.string.APIKEY));
+        weatherResponseCall.enqueue(new Callback<WeatherResponce>() {
             @Override
             public void onResponse(Call<WeatherResponce> call, Response<WeatherResponce> response) {
-                if (call.equals(mWeatherResponseCall)) {
+                if (call.equals(weatherResponseCall)) {
                     WeatherResponce weatherResponse = ((Response<WeatherResponce>) response).body();
                     if(response.isSuccessful()) {
-                        ContentValues weatherValue = mDataMapper.fromWeatherResponse(weatherResponse, weather.getBdCityId());
+                        ContentValues weatherValue = dataMapper.fromWeatherResponse(weatherResponse, weather.getBdCityId());
                         getActivity().getContentResolver()
                                 .insert(WeatherContract.WeatherEntry.CONTENT_URI, weatherValue);
                     } else {
@@ -181,11 +181,11 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mCityAdapter.swapCursor(data);
+        cityAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mCityAdapter.swapCursor(null);
+        cityAdapter.swapCursor(null);
     }
 }

@@ -24,7 +24,6 @@ import pro.games_box.weatherviewer.utils.CommonUtils;
  */
 
 public class CityHolder extends RecyclerView.ViewHolder {
-    // Холдер который отображает данные одного айтема из списка
     @BindView(R.id.weather_icon) public ImageView weatherIcon;
     @BindView(R.id.weather_delete) public LinearLayout weatherDelete;
     @BindView(R.id.weather_temp) TextView weatherTemp;
@@ -35,6 +34,7 @@ public class CityHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.weather_wind) TextView weatherWind;
     @BindView(R.id.weather_pressure) TextView weatherPressure;
     @BindView(R.id.weather) public LinearLayout weather;
+    @BindView(R.id.conditions) public LinearLayout conditions;
     public Context context;
 
     public CityHolder(View itemView) {
@@ -64,14 +64,15 @@ public class CityHolder extends RecyclerView.ViewHolder {
         weatherDescription.setText(weather.getWeather().get(0).getDescription());
 
         Date date = new Date(weather.getDatetime()*1000L); // *1000 is to convert seconds to milliseconds
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy HH:mm"); // the format of your date
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy HH:mm", Locale.US); // the format of your date
         sdf.setTimeZone(TimeZone.getTimeZone("GMT+3")); // give a timezone reference
         String formattedDate = sdf.format(date);
 
         weatherDatetime.setText(formattedDate);
 
-        weatherHumidity.setText(String.format(Locale.US,  context.getString(R.string.weather_humidity),
-                weather.getMainConditions().getHumidity()) + "%");
+        String strHumidity = String.format(Locale.US,  context.getString(R.string.weather_humidity),
+                weather.getMainConditions().getHumidity()) + "%";
+        weatherHumidity.setText(strHumidity);
         weatherWind.setText(String.format(Locale.US,  context.getString(R.string.weather_wind),
                 weather.getWind().getSpeed()));
         weatherPressure.setText(String.format(Locale.US,  context.getString(R.string.weather_pressure),
