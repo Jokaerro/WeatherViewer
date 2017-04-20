@@ -2,9 +2,14 @@ package pro.games_box.weatherviewer.ui.fragment;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -49,6 +54,7 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
     private CityAdapter cityAdapter;
     private Call<WeatherResponce> weatherResponseCall;
     private DataMapper dataMapper = new DataMapper();
+    private BroadcastReceiver internetReceiver;
 
     @BindView(R.id.relative_ll) RelativeLayout relativelayout;
     @BindView(R.id.city_list) RecyclerView cityRecycler;
@@ -82,6 +88,8 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
 
         Toolbar toolbar = ((MainActivity) getActivity()).toolbar;
 
+        registerInternetReceiver();
+
         getLoaderManager().initLoader(CITY_LOADER_ID, null, this);
         cityAdapter = new CityAdapter(getActivity(), null, WeatherFragment.this);
 
@@ -91,6 +99,7 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
 
         cityRecycler.setAdapter(cityAdapter);
 
+        notifyWeather();
         return rootView;
     }
 
@@ -185,5 +194,35 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         cityAdapter.swapCursor(null);
+    }
+
+    private void registerInternetReceiver()
+    {
+        if (this.internetReceiver != null) return;
+        this.internetReceiver = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive (Context context, Intent intent)
+            {
+                if (isInternetAvailable())
+                    notifyWeather();
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction (ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver (internetReceiver, filter);
+    }
+
+    private boolean isInternetAvailable()
+    {
+        try
+        {
+            return (Runtime.getRuntime().exec ("ping -c 1 google.com").waitFor() == 0);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return false;
     }
 }
