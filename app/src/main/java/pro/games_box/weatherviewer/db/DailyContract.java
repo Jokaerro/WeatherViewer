@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 
 import java.util.Locale;
 
@@ -62,8 +63,8 @@ public class DailyContract {
 
         public static Uri buildDailyWeather(String cityId, long startDate, long endDate) {
             return CONTENT_URI.buildUpon().appendQueryParameter(COLUMN_LOC_KEY, cityId)
-                    .appendQueryParameter(COLUMN_DATE, String.format(Locale.US, "%d", startDate))
-                    .appendQueryParameter(COLUMN_DATE, String.format(Locale.US, "%d", endDate)).build();
+                    .appendQueryParameter("startDate", String.valueOf(startDate))
+                    .appendQueryParameter("endDate", String.valueOf(endDate)).build();
         }
 
         public static String getCityIdFromUri(Uri uri) {
@@ -71,7 +72,7 @@ public class DailyContract {
         }
 
         public static long getStartDateFromUri(Uri uri) {
-            String dateString = uri.getQueryParameters(COLUMN_DATE).get(0);
+            String dateString = uri.getQueryParameter("startDate");
             if (null != dateString && dateString.length() > 0)
                 return Long.parseLong(dateString);
             else
@@ -79,8 +80,8 @@ public class DailyContract {
         }
 
         public static long getEndDateFromUri(Uri uri) {
-            String dateString = uri.getQueryParameters(COLUMN_DATE).get(1); //getQueryParameter(COLUMN_DATE);
-            if (null != dateString && dateString.length() > 0)
+            String dateString = uri.getQueryParameter("endDate");
+            if (!TextUtils.isEmpty(dateString))
                 return Long.parseLong(dateString);
             else
                 return 0;

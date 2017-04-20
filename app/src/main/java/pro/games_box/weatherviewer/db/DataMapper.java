@@ -116,6 +116,7 @@ public class DataMapper {
         temp.setDay(cursor.getDouble(cursor.getColumnIndex(DailyContract.DailyEntry.COLUMN_DAY_TEMP)));
         temp.setEve(cursor.getDouble(cursor.getColumnIndex(DailyContract.DailyEntry.COLUMN_EVE_TEMP)));
         temp.setNight(cursor.getDouble(cursor.getColumnIndex(DailyContract.DailyEntry.COLUMN_NIGHT_TEMP)));
+        daily.setTemp(temp);
 
 
         daily.setRain(cursor.getDouble(cursor.getColumnIndex(DailyContract.DailyEntry.COLUMN_RAIN)));

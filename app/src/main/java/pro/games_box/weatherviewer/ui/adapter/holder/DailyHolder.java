@@ -49,11 +49,20 @@ public class DailyHolder extends RecyclerView.ViewHolder{
     }
 
     public void fill(final Daily daily) {
-        dailyTemperature.setText(CommonUtils.getTempWithSign(daily.getTemp().getMin()) + " .. " + CommonUtils.getTempWithSign(daily.getTemp().getMax()));
-        dailyMornTemperature.setText(CommonUtils.getTempWithSign(daily.getTemp().getMorn()));
-        dailyDayTemperature.setText(CommonUtils.getTempWithSign(daily.getTemp().getDay()));
-        dailyEveTemperature.setText(CommonUtils.getTempWithSign(daily.getTemp().getEve()));
-        dailyNightTemperature.setText(CommonUtils.getTempWithSign(daily.getTemp().getNight()));
+        String temperature = String.format(Locale.US, context.getString(R.string.weather_temperature),
+                (CommonUtils.getTempWithSign(daily.getTemp().getMin()) + " .. " +
+                        CommonUtils.getTempWithSign(daily.getTemp().getMax())));
+        dailyTemperature.setText(temperature);
+
+        dailyMornTemperature.setText(String.format(Locale.US, context.getString(R.string.weather_temp_morning),
+                CommonUtils.getTempWithSign(daily.getTemp().getMorn())));
+
+        dailyDayTemperature.setText(String.format(Locale.US, context.getString(R.string.weather_temp_day),
+                CommonUtils.getTempWithSign(daily.getTemp().getDay())));
+        dailyEveTemperature.setText(String.format(Locale.US, context.getString(R.string.weather_temp_evening),
+                CommonUtils.getTempWithSign(daily.getTemp().getEve())));
+        dailyNightTemperature.setText(String.format(Locale.US, context.getString(R.string.weather_temp_night),
+                CommonUtils.getTempWithSign(daily.getTemp().getNight())));
 
         dailyDescription.setText(daily.getWeather().get(0).getDescription());
 
@@ -64,8 +73,8 @@ public class DailyHolder extends RecyclerView.ViewHolder{
 
         dailyDatetime.setText(formattedDate);
 
-        String strHumidity = String.format(Locale.US,  context.getString(R.string.weather_humidity) + "%",
-                daily.getHumidity());
+        String strHumidity = String.format(Locale.US,  context.getString(R.string.weather_humidity),
+                daily.getHumidity()) + "%";
         dailyHumidity.setText(strHumidity);
         dailyWindSpeed.setText(String.format(Locale.US,  context.getString(R.string.weather_wind),
                 daily.getWeendSpeed()));

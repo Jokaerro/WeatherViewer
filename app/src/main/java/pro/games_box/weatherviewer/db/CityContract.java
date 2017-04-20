@@ -39,5 +39,9 @@ public class CityContract {
             return BASE_CONTENT_URI.buildUpon().appendEncodedPath(PATH_CITY_WITH_LAST_WEATHER).build();
         }
 
+        public static Uri buildCityId() {
+            return BASE_CONTENT_URI.buildUpon().appendEncodedPath(PATH_CITY).build();
+        }
+
     }
 }

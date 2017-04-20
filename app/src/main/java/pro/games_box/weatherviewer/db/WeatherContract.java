@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 import android.text.format.Time;
 
 /**
@@ -83,7 +84,7 @@ public class WeatherContract {
 
         public static long getStartDateFromUri(Uri uri) {
             String dateString = uri.getQueryParameter(COLUMN_DATE);
-            if (null != dateString && dateString.length() > 0)
+            if (!TextUtils.isEmpty(dateString))
                 return Long.parseLong(dateString);
             else
                 return 0;

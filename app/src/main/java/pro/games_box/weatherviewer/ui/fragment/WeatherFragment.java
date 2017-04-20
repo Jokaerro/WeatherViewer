@@ -1,5 +1,7 @@
 package pro.games_box.weatherviewer.ui.fragment;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -72,11 +74,6 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
             WeatherContract.WeatherEntry.COLUMN_WIND_SPEED
     };
 
-    private static final int INDEX_CITY_SETTING = 0;
-    private static final int INDEX_CITY_NAME = 1;
-    private static final int INDEX_COORD_LAT = 2;
-    private static final int INDEX_COORD_LONG = 3;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -131,27 +128,28 @@ public class WeatherFragment extends BaseFragment implements Callback, LoaderMan
         Intent intent = new Intent(getContext(), WeatherSync.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(WeatherSync.TABLE, WeatherContract.WeatherEntry.TABLE_NAME);
-        bundle.putSerializable(WeatherSync.CITY_ID, 0);
+        bundle.putSerializable(WeatherSync.CITY_ID, "0");
         intent.putExtra(WeatherSync.DATA_PARAM, bundle);
         getContext().startService(intent);
     }
 
     @OnClick(R.id.fab)
     public void addCity() {
-        CommonUtils.createInputDialog(getActivity(), InputType.TYPE_CLASS_TEXT,
-                new CommonUtils.InputDialogListener() {
+        new MaterialDialog.Builder(getContext())
+                .title(getString(R.string.action_add_city))
+                .content(getString(R.string.action_add_city_msg))
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .input(getString(R.string.action_add_city_hint), "", new MaterialDialog.InputCallback() {
                     @Override
-                    public void onInput(AlertDialog dialog, String text) {
-                        dialog.setOnDismissListener(null);
+                    public void onInput(MaterialDialog dialog, CharSequence input) {
                         // Insert the new weather information into the database
                         ContentValues cityValue = new ContentValues();
-                        cityValue.put(CityContract.CityEntry.COLUMN_CITY_NAME, text);
+                        cityValue.put(CityContract.CityEntry.COLUMN_CITY_NAME, input.toString());
                         dialog.getContext().getContentResolver()
                                 .insert(CityContract.CityEntry.CONTENT_URI, cityValue);
                         notifyWeather();
                     }
-                });
-
+                }).show();
     }
 
     public void notifyWeather() {

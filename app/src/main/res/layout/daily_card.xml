@@ -47,26 +47,31 @@
                     android:id="@+id/daily_temperature"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/weather_temperature"
                     />
                  <TextView
                      android:id="@+id/daily_morn_temperature"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
+                     android:text="@string/weather_temp_morning"
                      />
                  <TextView
                      android:id="@+id/daily_day_temperature"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
+                     android:text="@string/weather_temp_day"
                      />
                  <TextView
                      android:id="@+id/daily_eve_temperature"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
+                     android:text="@string/weather_temp_evening"
                      />
                  <TextView
                      android:id="@+id/daily_night_temperature"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
+                     android:text="@string/weather_temp_night"
                      />
                 <TextView
                     android:id="@+id/daily_rain"
@@ -82,10 +87,9 @@
                      />
              </LinearLayout>
              <LinearLayout
-                 android:layout_width="140dp"
+                 android:layout_width="160dp"
                  android:layout_height="match_parent"
                  android:orientation="vertical"
-                 android:layout_weight="1"
                  >
                  <TextView
                      android:id="@+id/daily_description"

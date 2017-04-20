@@ -10,13 +10,15 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import pro.games_box.weatherviewer.model.Daily;
+
 /**
  * Created by TESLA on 07.04.2017.
  */
 
 public class WeatherProvider extends ContentProvider {
-    private static final UriMatcher sUriMatcher = buildUriMatcher();
-    private WeatherDbHelper mOpenHelper;
+    private static final UriMatcher uriMatcher = buildUriMatcher();
+    private WeatherDbHelper openHelper;
 
     static final int WEATHER = 100;
     static final int WEATHER_WITH_CITY = 101;
@@ -42,7 +44,6 @@ public class WeatherProvider extends ContentProvider {
     }
 
     private static final SQLiteQueryBuilder dailyWeatherByLocationQueryBuilder;
-
     static{
         dailyWeatherByLocationQueryBuilder = new SQLiteQueryBuilder();
 
@@ -70,9 +71,9 @@ public class WeatherProvider extends ContentProvider {
                         "." + CityContract.CityEntry._ID);
     }
 
-    private static final String locationSettingSelection =
-            CityContract.CityEntry.TABLE_NAME+
-                    "." + CityContract.CityEntry.COLUMN_CITY_SETTING + " = ? ";
+    private static final String citySelection =
+        CityContract.CityEntry.TABLE_NAME +
+                        "." + CityContract.CityEntry._ID + " = ? ";
 
     private static final String cityWithStartDateSelection =
             CityContract.CityEntry.TABLE_NAME+
@@ -103,7 +104,7 @@ public class WeatherProvider extends ContentProvider {
         selectionArgs = new String[]{locationSetting, Long.toString(startDate)};
         selection = cityWithStartDateSelection;
 
-        return weatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return weatherByLocationSettingQueryBuilder.query(openHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -123,7 +124,7 @@ public class WeatherProvider extends ContentProvider {
         selectionArgs = new String[]{locationSetting, Long.toString(startDate), Long.toString(endDate)};
         selection = cityWithStartDateEndDateSelection;
 
-        return dailyWeatherByLocationQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return dailyWeatherByLocationQueryBuilder.query(openHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -135,7 +136,7 @@ public class WeatherProvider extends ContentProvider {
 
     private Cursor getCitiesWithLastWeather(Uri uri, String[] projection,  String selection,
                                             String[] selectionArgs,  String sortOrder){
-        return citiesWithWeatherSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return citiesWithWeatherSettingQueryBuilder.query(openHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
@@ -149,7 +150,7 @@ public class WeatherProvider extends ContentProvider {
         String locationSetting = WeatherContract.WeatherEntry.getCitySettingFromUri(uri);
         long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
 
-        return weatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+        return weatherByLocationSettingQueryBuilder.query(openHelper.getReadableDatabase(),
                 projection,
                 locationSettingAndDaySelection,
                 new String[]{locationSetting, Long.toString(date)},
@@ -180,7 +181,7 @@ public class WeatherProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        mOpenHelper = new WeatherDbHelper(getContext());
+        openHelper = new WeatherDbHelper(getContext());
         return true;
     }
 
@@ -189,7 +190,7 @@ public class WeatherProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
                         @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         Cursor retCursor;
-        switch (sUriMatcher.match(uri)) {
+        switch (uriMatcher.match(uri)) {
             // "weather/*/*"
             case WEATHER_WITH_CITY_AND_DATE:
             {
@@ -213,7 +214,7 @@ public class WeatherProvider extends ContentProvider {
             }
             // "weather"
             case WEATHER: {
-                retCursor = mOpenHelper.getReadableDatabase().query(
+                retCursor = openHelper.getReadableDatabase().query(
                         WeatherContract.WeatherEntry.TABLE_NAME,
                         projection,
                         selection,
@@ -226,7 +227,7 @@ public class WeatherProvider extends ContentProvider {
             }
             // "city"
             case CITY: {
-                retCursor = mOpenHelper.getReadableDatabase().query(
+                retCursor = openHelper.getReadableDatabase().query(
                         CityContract.CityEntry.TABLE_NAME,
                         projection,
                         selection,
@@ -248,7 +249,7 @@ public class WeatherProvider extends ContentProvider {
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        final int match = sUriMatcher.match(uri);
+        final int match = uriMatcher.match(uri);
 
         switch (match) {
             case WEATHER_WITH_CITY_AND_DATE:
@@ -272,8 +273,8 @@ public class WeatherProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
+        final SQLiteDatabase db = openHelper.getWritableDatabase();
+        final int match = uriMatcher.match(uri);
         Uri returnUri;
 
         switch (match) {
@@ -319,8 +320,8 @@ public class WeatherProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
+        final SQLiteDatabase db = openHelper.getWritableDatabase();
+        final int match = uriMatcher.match(uri);
         int rowsDeleted;
         // This makes delete all rows return the number of rows deleted
         if ( null == selection ) selection = "1";
@@ -362,8 +363,8 @@ public class WeatherProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String selection,
                       @Nullable String[] selectionArgs) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
+        final SQLiteDatabase db = openHelper.getWritableDatabase();
+        final int match = uriMatcher.match(uri);
         int rowsUpdated;
 
         switch (match) {
@@ -395,8 +396,8 @@ public class WeatherProvider extends ContentProvider {
 
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
+        final SQLiteDatabase db = openHelper.getWritableDatabase();
+        final int match = uriMatcher.match(uri);
         switch (match) {
             case WEATHER:
                 db.beginTransaction();

@@ -1,6 +1,7 @@
 package pro.games_box.weatherviewer.ui.fragment;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,7 +28,9 @@ import pro.games_box.weatherviewer.api.Api;
 import pro.games_box.weatherviewer.api.ErrorUtils;
 import pro.games_box.weatherviewer.db.DataMapper;
 import pro.games_box.weatherviewer.db.ForecastContract;
+import pro.games_box.weatherviewer.db.WeatherContract;
 import pro.games_box.weatherviewer.model.response.ForecastResponse;
+import pro.games_box.weatherviewer.service.WeatherSync;
 import pro.games_box.weatherviewer.ui.activity.MainActivity;
 import pro.games_box.weatherviewer.ui.adapter.ForecastAdapter;
 import pro.games_box.weatherviewer.api.ApiError;
@@ -69,7 +72,7 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
         ButterKnife.bind(this, rootView);
         city = getArguments().getString(CITY);
         cityId = String.format(Locale.US, "%d", getArguments().getInt(CITY_ID));
-        cityTv.setText(city);
+        cityTv.setText(String.format(Locale.US, getContext().getString(R.string.detailed_forecast), city));
         Toolbar toolbar = ((MainActivity) getActivity()).toolbar;
 
         getLoaderManager().initLoader(FORECAST_LOADER_ID, null, this);
@@ -81,6 +84,8 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
 
         forecastRecycler.setAdapter(forecastAdapter);
         swipeRefreshLayout.setOnRefreshListener(this);
+
+        notifyWeather();
         return rootView;
     }
 
@@ -110,7 +115,17 @@ public class ForecastFragment extends BaseFragment implements Callback, SwipeRef
         }
     }
 
+    private void onSyncWeather() {
+        Intent intent = new Intent(getContext(), WeatherSync.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(WeatherSync.TABLE, ForecastContract.ForecastEntry.TABLE_NAME);
+        bundle.putSerializable(WeatherSync.CITY_ID, cityId);
+        intent.putExtra(WeatherSync.DATA_PARAM, bundle);
+        getContext().startService(intent);
+    }
+
     public void notifyWeather() {
+        onSyncWeather();
         Calendar c = Calendar.getInstance();
         long time = c.getTimeInMillis();
         if(getContext() != null)

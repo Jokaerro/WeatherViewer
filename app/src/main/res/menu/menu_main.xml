@@ -4,9 +4,15 @@
     tools:context="pro.games_box.weatherviewer.ui.activity.MainActivity"
     >
     <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"
+        android:id="@+id/action_3_days"
+        android:title="@string/action_3_days"
         android:orderInCategory="100"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_5_days"
+        android:title="@string/action_5_days"
+        android:orderInCategory="200"
         app:showAsAction="never"
         />
 </menu>

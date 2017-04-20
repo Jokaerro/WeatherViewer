@@ -14,9 +14,12 @@ import java.util.Locale;
 import pro.games_box.weatherviewer.R;
 import pro.games_box.weatherviewer.api.Api;
 import pro.games_box.weatherviewer.db.CityContract;
+import pro.games_box.weatherviewer.db.DailyContract;
 import pro.games_box.weatherviewer.db.DataMapper;
 import pro.games_box.weatherviewer.db.ForecastContract;
 import pro.games_box.weatherviewer.db.WeatherContract;
+import pro.games_box.weatherviewer.model.response.DailyForecastResponse;
+import pro.games_box.weatherviewer.model.response.ForecastResponse;
 import pro.games_box.weatherviewer.model.response.WeatherResponce;
 import pro.games_box.weatherviewer.utils.CommonUtils;
 import retrofit2.Call;
@@ -53,14 +56,14 @@ public class WeatherSync extends IntentService {
 
     public boolean onSync(Bundle bundle) {
         String tableName = (String) bundle.getSerializable(TABLE);
-        int cityId = (int) bundle.getSerializable(CITY_ID);
+        String cityId = (String) bundle.getSerializable(CITY_ID);
         if (CommonUtils.isEmptyOrNull(tableName)) {
             return false;
         }
         return onSync(tableName, cityId);
     }
 
-    public boolean onSync(String tableName, int cityId) {
+    public boolean onSync(String tableName, String cityId) {
         try {
             switch (tableName) {
                 case WeatherContract.WeatherEntry.TABLE_NAME:
@@ -73,8 +76,17 @@ public class WeatherSync extends IntentService {
                     long time = c.getTimeInMillis();
                     context.getContentResolver().notifyChange(ForecastContract
                             .ForecastEntry
-                            .buildWeatherCityWithStartDate(String.format(Locale.US, "%d", cityId), time), null, false);
+                            .buildWeatherCityWithStartDate(cityId, time), null, false);
                     break;
+                case DailyContract.DailyEntry.TABLE_NAME:
+                    Calendar cd = Calendar.getInstance();
+                    long startTime = cd.getTimeInMillis() / 1000;
+                    cd.add(Calendar.DATE, 7);
+                    long endTime = cd.getTimeInMillis() / 1000;
+                    context.getContentResolver().notifyChange(DailyContract
+                            .DailyEntry
+                            .buildDailyWeather (cityId, startTime, endTime), null, false);
+                    onSyncDaily(cityId);
                 default:
                     break;
             }
@@ -122,7 +134,51 @@ public class WeatherSync extends IntentService {
         return false;
     }
 
-    private boolean onSyncForecast(int cityId) throws IOException {
+    private boolean onSyncForecast(String cityId) throws IOException {
+        Cursor cursor;
+        cursor = context.getContentResolver().query(CityContract.CityEntry.buildCityId(),
+                null,
+                CityContract.CityEntry._ID + "=?",
+                new String[]{cityId},
+                null);
+        if(!cursor.moveToFirst())
+            return false;
+        Call<ForecastResponse> call = Api.getApiService().getForecast(dataMapper.fromCursorGetCity(cursor), "38", "metric", "ru", context.getString(R.string.APIKEY));
+        Response<ForecastResponse> response = call.execute();
+        ForecastResponse forecastResponse = ((Response<ForecastResponse>) response).body();
+
+        if(response.isSuccessful()) {
+            for (int i = 0; i < forecastResponse.getForecast().size(); i++) {
+                ContentValues forecastValue = dataMapper.fromForecastItem(forecastResponse.getForecast().get(i), cityId);
+
+                context.getContentResolver()
+                            .insert(ForecastContract.ForecastEntry.CONTENT_URI, forecastValue);
+            }
+        }
+
+        return false;
+    }
+    private boolean onSyncDaily(String cityId) throws IOException {
+        Cursor cursor;
+        cursor = context.getContentResolver().query(CityContract.CityEntry.buildCityId(),
+                null,
+                CityContract.CityEntry._ID + "=?",
+                new String[]{cityId},
+                null);
+        if(!cursor.moveToFirst())
+            return false;
+        Call<DailyForecastResponse> call = Api.getApiService().getDaily(dataMapper.fromCursorGetCity(cursor), "7", "metric", "ru", context.getString(R.string.APIKEY));
+        Response<DailyForecastResponse> response = call.execute();
+        DailyForecastResponse dailyResponse = ((Response<DailyForecastResponse>) response).body();
+
+        if(response.isSuccessful()) {
+            for (int i = 0; i < dailyResponse.getDaily().size(); i++) {
+                ContentValues dailyValue = dataMapper.fromDaily(dailyResponse.getDaily().get(i), cityId);
+
+                context.getContentResolver()
+                            .insert(DailyContract.DailyEntry.CONTENT_URI, dailyValue);
+            }
+        }
         return false;
     }
 }

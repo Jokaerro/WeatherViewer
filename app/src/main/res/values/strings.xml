@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">WeatherViewer</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_add_city">Add</string>
-    <string name="action_add_city_msg">Add a city to get weather</string>
+    <string name="action_3_days">3 дня</string>
+    <string name="action_5_days">5 дней</string>
+    <string name="action_add_city">Добавьте город</string>
+    <string name="action_add_city_msg">Введите название города</string>
+    <string name="action_add_city_hint">Например Москва</string>
     <string name="APIKEY">da2e10fa4e2557831b28f385c2f0f926</string>
-    <string name="pull2refresh">No data, please pull to refresh</string>
+    <string name="pull2refresh">Пожалуйста подождите</string>
+    <string name="weather_forecast">Прогноз: %s</string>
+    <string name="detailed_forecast">Детализация: %s</string>
 </resources>

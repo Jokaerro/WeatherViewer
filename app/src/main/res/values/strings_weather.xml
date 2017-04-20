@@ -5,5 +5,10 @@
    <string name="weather_wind">Ветер %.1f м/с</string>
    <string name="weather_pressure">Давление %.0f мм</string>
    <string name="weather_rain">Дождь %f мм</string>
-   <string name="weather_snow">нег %f мм</string>
+   <string name="weather_snow">Снег %f мм</string>
+   <string name="weather_temperature">Температура %s</string>
+   <string name="weather_temp_morning">Утром %s</string>
+   <string name="weather_temp_day">Днем %s</string>
+   <string name="weather_temp_evening">Вечером %s</string>
+   <string name="weather_temp_night">Ночью %s</string>
 </resources>
